@@ -27,7 +27,7 @@ interface PreviewProps {
 }
 
 const blankPage = (pageNumber: number): PageData => ({
-  text: '',
+  html: '',
   pageNumber,
   fill: 0,
   empty: true,

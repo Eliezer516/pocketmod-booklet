@@ -1,28 +1,37 @@
-export const SAMPLE_TEXT = `GUÍA RÁPIDA PARA TU POCKETMOD
+export const SAMPLE_TEXT = `# GUÍA RÁPIDA PARA TU POCKETMOD
 
-Un PocketMod es una sola hoja de papel que, después de unos cuantos dobleces y un pequeño corte, se convierte en un cuadernillo de ocho páginas. No necesita grapas, pegamento ni anillos: solo papel, tijeras y unos minutos.
+Un **PocketMod** es una sola hoja de papel que, después de unos cuantos dobleces y un pequeño corte, se convierte en un cuadernillo de **ocho páginas**. No necesita grapas ni pegamento.
 
-CÓMO IMPRIMIRLO
+## Cómo imprimirlo
 
-Imprime la hoja en una sola cara, en horizontal y al cien por ciento. Desactiva la opción "ajustar a la página" de tu navegador y los márgenes o encabezados automáticos. La fila inferior aparece girada 180 grados: es correcto, así debe verse antes de doblar.
+Imprime la hoja en una sola cara, en horizontal y al **100 %**. Desactiva la opción de ajustar a la página y los encabezados automáticos.
 
-CÓMO DOBLARLO
+> La fila inferior aparece girada 180°. Es correcto: al doblar, esas páginas quedarán hacia fuera.
 
-Primero dobla la hoja por la mitad a lo largo, con la impresión hacia fuera. Vuelve a doblarla en cuatro y haz un corte por el pliegue central, entre las dos columnas del medio. Despliega y dobla en acordeón hasta formar el cuadernillo. La página uno es la portada y la ocho la contraportada.
+## Cómo doblarlo
 
-QUÉ PUEDES GUARDAR AQUÍ
+1. Dobla la hoja por la mitad a lo largo.
+2. Vuelve a doblarla en cuatro.
+3. Haz un corte por el pliegue central.
+4. Despliega y dobla en acordeón.
 
-Esta herramienta reparte un texto largo de forma automática. Puede servir para llevar una guía de viaje, los pasos de una receta, una lista de verificación, apuntes de estudio, contactos de emergencia o el resumen de un proyecto.
+## Qué puedes guardar
 
-CONSEJOS PARA ESCRIBIR
+- Una guía de viaje.
+- Los pasos de una receta.
+- Una lista de verificación.
+- Apuntes de estudio.
+- Contactos de emergencia.
 
-Usa frases cortas y párrafos separados por una línea en blanco. Los títulos en mayúsculas funcionan bien como separadores visuales. Si el texto no cabe, la aplicación reduce un poco el tamaño de la letra; si aun así es demasiado largo, crea varios cuadernillos y los numera para que no pierdas el orden.
+## Atajos
 
-RECUERDA
+| Acción | Cómo |
+| --- | --- |
+| Imprimir | Botón **Imprimir** |
+| Cambiar papel | Ajustes → Papel |
+| Añadir énfasis | \`**texto**\` |
 
-El papel es reutilizable. Cuando termines un cuadernillo, separa la hoja, úsala para tomar notas y vuelve a imprimir otro cuando lo necesites. Un organizador de bolsillo no tiene que ser perfecto: tiene que caber en tu bolsillo y ayudarte a recordar lo importante.
-
-MI LISTA DE HOY
+## Mi lista de hoy
 
 - Revisar el correo pendiente.
 - Terminar la lectura del capítulo tres.
@@ -30,5 +39,6 @@ MI LISTA DE HOY
 - Llamar a mamá.
 - Escribir tres ideas para el proyecto nuevo.
 - Caminar veinte minutos.
-- Preparar la mochila para mañana.
-- Dormir antes de las once.`;
+- Dormir antes de las once.
+
+Más información en [pocketmod.com](https://pocketmod.com).`;

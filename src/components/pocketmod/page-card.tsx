@@ -3,6 +3,7 @@ import {
   FONT_STACKS,
   type Settings,
 } from '../../lib/settings';
+import { PAPERS, mmToPx, panelHeightMm } from '../../lib/paper';
 import type { PageData } from '../../lib/pagination';
 
 interface PageCardProps {
@@ -11,44 +12,14 @@ interface PageCardProps {
   fontSizePt: number;
 }
 
-/**
- * Renders the page text one logical line at a time so that a wrapped heading
- * (usually all caps) is never stretched by justification. Every non-empty line
- * stays a single block, and blank lines become spacers of exactly one line
- * height. The total height therefore matches the measurement made by the
- * paginator.
- */
-function renderBlocks(text: string, justify: boolean, lineHeight: number) {
-  return text.split('\n').map((line, index) => {
-    if (line.trim().length === 0) {
-      return (
-        <div
-          key={`s-${index}`}
-          aria-hidden="true"
-          style={{ height: `${lineHeight}em` }}
-        />
-      );
-    }
-
-    const letters = line.replace(/[^\p{L}]/gu, '');
-    const allCaps = letters.length > 0 && letters === letters.toUpperCase();
-
-    return (
-      <div
-        key={`l-${index}`}
-        style={{
-          margin: 0,
-          whiteSpace: 'pre-wrap',
-          textAlign: justify && !allCaps ? 'justify' : 'left',
-        }}
-      >
-        {line}
-      </div>
-    );
-  });
-}
-
 export function PageCard({ page, settings, fontSizePt }: PageCardProps) {
+  const footerReserve = settings.pageNumbers ? FOOTER_RESERVE_MM : 0;
+  const contentHeightPx = mmToPx(
+    panelHeightMm(PAPERS[settings.paper]) -
+      settings.marginMm * 2 -
+      footerReserve,
+  );
+
   return (
     <div
       className="pocket-page"
@@ -69,17 +40,15 @@ export function PageCard({ page, settings, fontSizePt }: PageCardProps) {
       }}
     >
       <div
+        className="pocket-markdown"
         style={{
           flex: '1 1 auto',
           minHeight: 0,
           overflow: 'hidden',
-          whiteSpace: 'pre-wrap',
-          overflowWrap: 'break-word',
-          wordBreak: 'normal',
+          ['--page-content-height' as string]: `${contentHeightPx}px`,
         }}
-      >
-        {renderBlocks(page.text, settings.justify, settings.lineHeight)}
-      </div>
+        dangerouslySetInnerHTML={{ __html: page.html }}
+      />
 
       {settings.pageNumbers ? (
         <div

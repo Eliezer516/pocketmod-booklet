@@ -22,7 +22,12 @@ export function EditorPanel({
       <div className="flex items-start justify-between gap-3 border-b border-line px-4 py-3">
         <div>
           <p className="eyebrow">Entrada</p>
-          <h2 className="font-display text-xl leading-tight">Tu texto</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="font-display text-xl leading-tight">Tu texto</h2>
+            <span className="rounded border border-line bg-paper-100 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-ink-500">
+              Markdown
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -51,7 +56,7 @@ export function EditorPanel({
         onChange={(event) => onChange(event.target.value)}
         aria-label="Texto del cuadernillo"
         placeholder={
-          'Pega aquí todo el texto. Los párrafos separados por una línea en blanco se conservan.\n\nEjemplo:\nLISTA DE VIAJE\n- Pasaporte\n- Cargador\n- Novela para el tren'
+          '# Título del cuadernillo\n\nPega aquí tu texto en **Markdown**: títulos, listas, negritas, enlaces...\n\n- Primera tarea\n- Segunda tarea\n\n> Un consejo breve.'
         }
         spellCheck
         className="block min-h-[290px] w-full resize-y bg-transparent px-4 py-4 font-reading text-[14.5px] leading-[1.65] text-ink-900 outline-none placeholder:text-ink-500/80 lg:min-h-[330px]"

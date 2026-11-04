@@ -120,6 +120,200 @@
   details > summary::-webkit-details-marker {
     display: none;
   }
+
+  /* Rendered markdown inside a PocketMod page or in the hidden measurer. */
+  .pocket-markdown {
+    overflow-wrap: break-word;
+    word-break: normal;
+    hyphens: manual;
+  }
+
+  .pocket-markdown > * {
+    margin: 0;
+  }
+
+  /*
+   * `:not(:first-child)` is used instead of `* + *` so this rule outranks the
+   * element-specific `margin: 0` declarations further down the file.
+   */
+  .pocket-markdown > :not(:first-child) {
+    margin-top: 0.55em;
+  }
+
+  .pocket-markdown > :is(h1, h2, h3, h4, h5, h6):not(:first-child) {
+    margin-top: 0.9em;
+  }
+
+  .pocket-markdown h1,
+  .pocket-markdown h2,
+  .pocket-markdown h3,
+  .pocket-markdown h4,
+  .pocket-markdown h5,
+  .pocket-markdown h6 {
+    margin: 0;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-align: left;
+    break-after: avoid;
+  }
+
+  .pocket-markdown h1 {
+    font-size: 1.32em;
+  }
+
+  .pocket-markdown h2 {
+    font-size: 1.16em;
+  }
+
+  .pocket-markdown h3 {
+    font-size: 1.06em;
+  }
+
+  .pocket-markdown h4,
+  .pocket-markdown h5,
+  .pocket-markdown h6 {
+    font-size: 1em;
+  }
+
+  .pocket-markdown p {
+    margin: 0;
+  }
+
+  .pocket-markdown ul,
+  .pocket-markdown ol {
+    margin: 0;
+    padding-left: 1.2em;
+  }
+
+  .pocket-markdown ul {
+    list-style: disc;
+  }
+
+  .pocket-markdown ul ul {
+    list-style: circle;
+  }
+
+  .pocket-markdown ul ul ul {
+    list-style: square;
+  }
+
+  .pocket-markdown ol {
+    list-style: decimal;
+  }
+
+  .pocket-markdown li {
+    margin: 0;
+    text-align: left;
+  }
+
+  .pocket-markdown li::marker {
+    color: var(--color-ink-700);
+  }
+
+  .pocket-markdown li + li {
+    margin-top: 0.08em;
+  }
+
+  .pocket-markdown li > ul,
+  .pocket-markdown li > ol {
+    margin-top: 0.08em;
+  }
+
+  .pocket-markdown .pocket-list-continuation {
+    list-style: none;
+  }
+
+  .pocket-markdown blockquote {
+    margin: 0;
+    padding-left: 0.6em;
+    border-left: 1.5px solid var(--color-line);
+    color: var(--color-ink-700);
+  }
+
+  .pocket-markdown blockquote > * + * {
+    margin-top: 0.4em;
+  }
+
+  .pocket-markdown strong {
+    font-weight: 700;
+  }
+
+  .pocket-markdown em {
+    font-style: italic;
+  }
+
+  .pocket-markdown s {
+    text-decoration: line-through;
+  }
+
+  .pocket-markdown a {
+    color: var(--color-accent-700);
+    text-decoration: underline;
+    text-decoration-thickness: 0.06em;
+    text-underline-offset: 0.12em;
+  }
+
+  .pocket-markdown code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background-color: #f2ecdf;
+    border-radius: 2px;
+    padding: 0 0.18em;
+  }
+
+  .pocket-markdown pre {
+    margin: 0;
+    padding: 0.4em 0.5em;
+    background-color: #f7f2e7;
+    border: 1px solid var(--color-line);
+    border-radius: 3px;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    text-align: left;
+  }
+
+  .pocket-markdown pre code {
+    padding: 0;
+    background: transparent;
+    font-size: 0.9em;
+    line-height: 1.35;
+  }
+
+  .pocket-markdown hr {
+    margin: 0;
+    border: 0;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .pocket-markdown table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.94em;
+    text-align: left;
+  }
+
+  .pocket-markdown th,
+  .pocket-markdown td {
+    border: 1px solid var(--color-line);
+    padding: 0.15em 0.3em;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .pocket-markdown th {
+    background-color: #f5f0e6;
+    font-weight: 700;
+  }
+
+  .pocket-markdown img {
+    display: block;
+    max-width: 100%;
+    max-height: var(--page-content-height, 260px);
+    height: auto;
+    margin: 0 auto;
+    object-fit: contain;
+  }
 }
 
 /* The real sheet only exists for the printer. */

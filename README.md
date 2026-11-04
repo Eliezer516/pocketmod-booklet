@@ -14,6 +14,38 @@ pnpm dev      # http://localhost:3000
 pnpm build    # sitio estático en dist/public
 ```
 
+## Formato del texto
+
+El editor acepta **Markdown**. Se renderiza tal cual en la vista previa y en la
+hoja impresa:
+
+~~~~markdown
+# Título
+## Sección
+
+Párrafo con **negritas**, *cursivas*, `código` y un [enlace](https://ejemplo.com).
+
+- Lista con viñetas
+- Segunda tarea
+
+1. Lista numerada
+2. Segundo paso
+
+> Cita o recordatorio
+
+| Hora  | Tarea        |
+| ----- | ------------ |
+| 09:00 | Revisar notas |
+
+```text
+bloque de código
+```
+~~~~
+
+Los encabezados, listas, tablas, citas, código y reglas horizontales se
+reparten entre páginas sin romper palabras ni filas a la mitad. Si una tabla no
+cabe completa, continúa en la página siguiente y repite su encabezado.
+
 ## Cómo funciona
 
 - El texto se mide en un contenedor oculto y se corta por líneas completas.
