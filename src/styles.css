@@ -1,0 +1,174 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-paper-50: #fdfbf6;
+  --color-paper-100: #f5f0e6;
+  --color-paper-200: #e9e1d2;
+  --color-line: #d8cfbe;
+
+  --color-ink-900: #1f1c16;
+  --color-ink-800: #2f2a21;
+  --color-ink-700: #433c30;
+  --color-ink-600: #5d5446;
+  --color-ink-500: #786e5d;
+  --color-ink-400: #9b9180;
+
+  --color-accent-600: #b24a2e;
+  --color-accent-700: #8d3822;
+
+  --font-display:
+    'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia,
+    serif;
+  --font-reading:
+    'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia,
+    serif;
+  --font-mono:
+    ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Consolas,
+    'Liberation Mono', monospace;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-paper-100);
+    color: var(--color-ink-900);
+    font-family: var(--font-display);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: rgb(178 74 46 / 0.22);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent-600);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-ink-500);
+  }
+
+  .paper-shadow {
+    box-shadow:
+      0 1px 1px rgb(31 28 22 / 0.05),
+      0 10px 24px -14px rgb(31 28 22 / 0.35),
+      0 22px 48px -34px rgb(31 28 22 / 0.4);
+  }
+
+  .range-input {
+    appearance: none;
+    height: 18px;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .range-input::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(
+      to right,
+      var(--color-ink-800),
+      var(--color-ink-800)
+    );
+    opacity: 0.85;
+  }
+
+  .range-input::-webkit-slider-thumb {
+    appearance: none;
+    margin-top: -5px;
+    height: 14px;
+    width: 14px;
+    border-radius: 999px;
+    border: 2px solid var(--color-paper-50);
+    background-color: var(--color-accent-600);
+    box-shadow: 0 0 0 1px rgb(31 28 22 / 0.25);
+  }
+
+  .range-input::-moz-range-track {
+    height: 4px;
+    border-radius: 999px;
+    background-color: var(--color-ink-800);
+    opacity: 0.85;
+  }
+
+  .range-input::-moz-range-thumb {
+    height: 14px;
+    width: 14px;
+    border: 2px solid var(--color-paper-50);
+    border-radius: 999px;
+    background-color: var(--color-accent-600);
+    box-shadow: 0 0 0 1px rgb(31 28 22 / 0.25);
+  }
+
+  .range-input:focus-visible {
+    outline-offset: 4px;
+  }
+
+  details > summary::-webkit-details-marker {
+    display: none;
+  }
+}
+
+/* The real sheet only exists for the printer. */
+.print-root {
+  display: none;
+}
+
+@media print {
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .screen-only {
+    display: none !important;
+  }
+
+  .print-root {
+    display: block !important;
+  }
+
+  .print-sheet {
+    position: relative;
+    overflow: hidden;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    break-after: page;
+    page-break-after: always;
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+  }
+
+  .print-sheet:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  .pocket-sheet {
+    box-shadow: none !important;
+  }
+}
