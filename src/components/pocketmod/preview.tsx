@@ -306,6 +306,13 @@ function SheetView({
         Esta es la hoja que se imprime: una cara, {paper.label} horizontal y
         escala 100 %. La fila inferior se ve girada a propósito.
       </p>
+      {settings.guides ? (
+        <p className="mx-auto mt-2 max-w-xl text-center text-xs leading-relaxed text-accent-700">
+          Marco exterior activo: si tu impresora no imprime hasta el borde,
+          activa «ajustar a los márgenes de la impresora» y recorta siguiendo
+          la línea exterior antes de doblar.
+        </p>
+      ) : null}
     </div>
   );
 }

@@ -100,6 +100,24 @@ export function Sheet({
               opacity: 0.85,
             }}
           />
+          {/*
+           * Outer trim frame. Some printers cannot print to the paper edge and
+           * apply their own margins, so the sheet has to be scaled down with
+           * "fit to printer margins". Cutting along this frame removes those
+           * margins and leaves the full PocketMod sheet.
+           *
+           * 2px is 0.53 mm at print size. Chrome floors fractional border
+           * widths to whole pixels, so a mm value would come out thinner.
+           */}
+          <div
+            data-pocket-frame="trim"
+            style={{
+              position: 'absolute',
+              inset: '0.4mm',
+              border: '2px solid currentColor',
+              opacity: 0.9,
+            }}
+          />
         </div>
       ) : null}
     </div>

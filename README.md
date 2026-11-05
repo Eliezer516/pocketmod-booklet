@@ -79,7 +79,11 @@ hoja impresa muestran siempre el resultado ya renderizado.
 - Desactiva «ajustar a la página», los márgenes y los encabezados del navegador.
 - La fila inferior girada es correcta: quedará hacia fuera al doblar.
 - La opción **Guías de doblez** (en Opciones avanzadas) añade las líneas de
-  doblez y la marca del corte para una hoja de prueba.
+  doblez, la marca del corte y un marco exterior de recorte.
+- Si tu impresora recorta los bordes o aplica márgenes que no puedes quitar,
+  imprime con la opción «ajustar a los márgenes de la impresora» y recorta la
+  hoja siguiendo el marco exterior. Así recuperas el tamaño completo antes de
+  doblar.
 
 ## Estructura
 

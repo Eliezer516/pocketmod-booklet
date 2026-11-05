@@ -130,7 +130,7 @@ export function ControlsPanel({
 
             <Toggle
               label="Guías de doblez"
-              description="Líneas y marca de corte para la hoja de prueba."
+              description="Marco exterior de recorte, líneas de doblez y marca del corte."
               checked={settings.guides}
               onChange={(checked) => onChange('guides', checked)}
             />

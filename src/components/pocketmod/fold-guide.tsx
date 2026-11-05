@@ -85,6 +85,15 @@ export function FoldGuide({ onClose }: { onClose: () => void }) {
             </Step>
           </ol>
 
+          <p className="rounded-lg border border-accent-600/25 bg-accent-600/5 px-3 py-2.5 text-xs leading-relaxed text-ink-700">
+            <strong className="font-semibold text-ink-900">
+              ¿La impresora recorta los bordes?
+            </strong>{' '}
+            Activa «Guías de doblez», imprime con «ajustar a los márgenes de la
+            impresora» y recorta la hoja siguiendo el marco exterior. Después
+            dobla con normalidad.
+          </p>
+
           <button
             type="button"
             onClick={onClose}
