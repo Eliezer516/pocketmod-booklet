@@ -12,6 +12,7 @@
   "dependencies": {
     "hono": "^4.12.14",
     "markdown-it": "^15.0.3",
+    "overtype": "^2.7.0",
     "react": "~19.3.1",
     "react-dom": "~19.3.1",
     "react-server-dom-webpack": "~19.3.1",

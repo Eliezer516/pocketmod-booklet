@@ -316,6 +316,49 @@
   }
 }
 
+/*
+ * OverType injects its stylesheet outside every cascade layer, so these
+ * overrides are deliberately unlayered too. The editor uses the same serif as
+ * the preview; bold and italic change glyph widths in a proportional font and
+ * would desynchronise the invisible textarea, so in edit mode they are faked
+ * with a thin stroke (OverType's documented workaround). Preview mode keeps
+ * real bold and italic.
+ */
+.overtype-container:not([data-mode='preview'])
+  .overtype-wrapper
+  .overtype-preview
+  :is(h1, h2, h3, strong, .header) {
+  font-weight: normal !important;
+  -webkit-text-stroke: 0.55px currentColor;
+}
+
+.overtype-container:not([data-mode='preview'])
+  .overtype-wrapper
+  .overtype-preview
+  :is(em, .blockquote) {
+  font-style: normal !important;
+}
+
+/* Keep the formatting toolbar on one row inside the narrow sidebar. */
+.overtype-container .overtype-toolbar {
+  padding: 6px !important;
+  gap: 3px !important;
+  scrollbar-width: none;
+}
+
+.overtype-container .overtype-toolbar::-webkit-scrollbar {
+  display: none;
+}
+
+.overtype-container .overtype-toolbar-button {
+  width: 30px !important;
+  height: 30px !important;
+}
+
+.overtype-container .overtype-toolbar-separator {
+  margin: 0 3px !important;
+}
+
 /* The real sheet only exists for the printer. */
 .print-root {
   display: none;

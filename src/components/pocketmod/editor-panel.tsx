@@ -1,3 +1,4 @@
+import { MarkdownEditor } from './markdown-editor';
 import { SparkIcon, TrashIcon } from './icons';
 
 interface EditorPanelProps {
@@ -24,7 +25,7 @@ export function EditorPanel({
           <p className="eyebrow">Entrada</p>
           <div className="flex items-center gap-2">
             <h2 className="font-display text-xl leading-tight">Tu texto</h2>
-            <span className="rounded border border-line bg-paper-100 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-ink-500">
+            <span className="hidden rounded border border-line bg-paper-100 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-ink-500 sm:inline">
               Markdown
             </span>
           </div>
@@ -51,16 +52,10 @@ export function EditorPanel({
         </div>
       </div>
 
-      <textarea
+      <MarkdownEditor
         value={text}
-        onChange={(event) => onChange(event.target.value)}
-        aria-label="Texto del cuadernillo"
-        placeholder={
-          '# Título del cuadernillo\n\nPega aquí tu texto en **Markdown**: títulos, listas, negritas, enlaces...\n\n- Primera tarea\n- Segunda tarea\n\n> Un consejo breve.'
-        }
-        spellCheck
-        className="block min-h-[290px] w-full resize-y bg-transparent px-4 py-4 font-reading text-[14.5px] leading-[1.65] text-ink-900 outline-none placeholder:text-ink-500/80 lg:min-h-[330px]"
-        style={{ fontFamily: 'var(--font-reading)' }}
+        onChange={onChange}
+        className="h-[300px] w-full bg-paper-50 sm:h-[320px] lg:h-[340px]"
       />
 
       <div className="flex items-center gap-3 border-t border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.08em] text-ink-500">

@@ -46,6 +46,22 @@ Los encabezados, listas, tablas, citas, código y reglas horizontales se
 reparten entre páginas sin romper palabras ni filas a la mitad. Si una tabla no
 cabe completa, continúa en la página siguiente y repite su encabezado.
 
+### Editor
+
+El panel de entrada usa [OverType](https://overtype.dev), un editor Markdown
+ligero que deja visible la sintaxis mientras aplica el formato. La barra
+superior formatea la selección y los atajos funcionan igual que en cualquier
+editor de Markdown:
+
+- `Ctrl/Cmd + B` negrita, `Ctrl/Cmd + I` cursiva.
+- `Ctrl/Cmd + K` enlace, `Ctrl/Cmd + E` código en línea.
+- `Ctrl/Cmd + Alt + 1` / `2` títulos.
+- `Ctrl/Cmd + Shift + 8` lista con viñetas, `Ctrl/Cmd + Shift + 7` numerada.
+- `Ctrl/Cmd + Shift + .` cita.
+
+Las marcas (`**`, `#`, `>`…) se ven mientras escribes; la vista previa y la
+hoja impresa muestran siempre el resultado ya renderizado.
+
 ## Cómo funciona
 
 - El texto se mide en un contenedor oculto y se corta por líneas completas.
@@ -69,6 +85,6 @@ cabe completa, continúa en la página siguiente y repite su encabezado.
 
 ```
 src/pages/                 página estática y layout
-src/components/pocketmod/  editor, controles, vista previa, hoja y guía
+src/components/pocketmod/  editor OverType, controles, vista previa, hoja y guía
 src/lib/                   papel, ajustes, imposición, paginación y almacenamiento
 ```
