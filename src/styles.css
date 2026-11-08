@@ -1,24 +1,24 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-paper-50: #fdfbf6;
-  --color-paper-100: #f5f0e6;
-  --color-paper-200: #e9e1d2;
-  --color-line: #d8cfbe;
+  --color-paper-50: #ffffff;
+  --color-paper-100: #f6f6f6;
+  --color-paper-200: #ececec;
+  --color-line: rgb(0 0 0 / 12%);
 
-  --color-ink-900: #1f1c16;
-  --color-ink-800: #2f2a21;
-  --color-ink-700: #433c30;
-  --color-ink-600: #5d5446;
-  --color-ink-500: #786e5d;
-  --color-ink-400: #9b9180;
+  --color-ink-900: #0a0a0a;
+  --color-ink-800: #1a1a1a;
+  --color-ink-700: #333333;
+  --color-ink-600: #4f4f4f;
+  --color-ink-500: #6b6b6b;
+  --color-ink-400: #8f8f8f;
 
   --color-accent-600: #b24a2e;
   --color-accent-700: #8d3822;
 
   --font-display:
-    'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia,
-    serif;
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
   --font-reading:
     'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia,
     serif;
@@ -48,24 +48,33 @@
     outline: 2px solid var(--color-accent-600);
     outline-offset: 2px;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
 @layer components {
   .eyebrow {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 600;
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 500;
     line-height: 1.4;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+    letter-spacing: 0.01em;
     color: var(--color-ink-500);
   }
 
   .paper-shadow {
     box-shadow:
-      0 1px 1px rgb(31 28 22 / 0.05),
-      0 10px 24px -14px rgb(31 28 22 / 0.35),
-      0 22px 48px -34px rgb(31 28 22 / 0.4);
+      0 1px 1px rgb(0 0 0 / 0.04),
+      0 10px 30px -18px rgb(0 0 0 / 0.22);
   }
 
   .range-input {
@@ -93,8 +102,8 @@
     width: 14px;
     border-radius: 999px;
     border: 2px solid var(--color-paper-50);
-    background-color: var(--color-accent-600);
-    box-shadow: 0 0 0 1px rgb(31 28 22 / 0.25);
+    background-color: var(--color-ink-900);
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 0.25);
   }
 
   .range-input::-moz-range-track {
@@ -109,8 +118,8 @@
     width: 14px;
     border: 2px solid var(--color-paper-50);
     border-radius: 999px;
-    background-color: var(--color-accent-600);
-    box-shadow: 0 0 0 1px rgb(31 28 22 / 0.25);
+    background-color: var(--color-ink-900);
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 0.25);
   }
 
   .range-input:focus-visible {
@@ -257,7 +266,7 @@
   .pocket-markdown code {
     font-family: var(--font-mono);
     font-size: 0.9em;
-    background-color: #f2ecdf;
+    background-color: #f2f2f2;
     border-radius: 2px;
     padding: 0 0.18em;
   }
@@ -265,7 +274,7 @@
   .pocket-markdown pre {
     margin: 0;
     padding: 0.4em 0.5em;
-    background-color: #f7f2e7;
+    background-color: #f7f7f7;
     border: 1px solid var(--color-line);
     border-radius: 3px;
     white-space: pre-wrap;
@@ -302,7 +311,7 @@
   }
 
   .pocket-markdown th {
-    background-color: #f5f0e6;
+    background-color: #f2f2f2;
     font-weight: 700;
   }
 

@@ -37,6 +37,7 @@ export function App() {
   const [hydrated, setHydrated] = useState(false);
   const [fontsReady, setFontsReady] = useState(false);
   const saveTimer = useRef<number | null>(null);
+  const foldButtonRef = useRef<HTMLButtonElement>(null);
 
   const paper = PAPERS[settings.paper];
   const words = useMemo(() => countWords(text), [text]);
@@ -145,6 +146,12 @@ export function App() {
     setSettings(DEFAULT_SETTINGS);
   }, []);
 
+  const closeFoldGuide = useCallback(() => {
+    setFoldGuideOpen(false);
+    // Return focus to the control that opened the dialog.
+    window.requestAnimationFrame(() => foldButtonRef.current?.focus());
+  }, []);
+
   const handlePrint = useCallback(() => {
     if (!hasText) return;
 
@@ -171,28 +178,31 @@ export function App() {
       <style>{`@page { size: ${paper.widthMm}mm ${paper.heightMm}mm; margin: 0; }`}</style>
 
       <div className="screen-only min-h-svh bg-paper-100 text-ink-900">
-        <header className="sticky top-0 z-30 border-b border-line bg-paper-50/95 backdrop-blur supports-[backdrop-filter]:bg-paper-50/80">
-          <div className="mx-auto flex max-w-[1500px] flex-wrap items-center gap-3 px-4 py-3 sm:px-6">
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-line bg-paper-100 text-ink-900">
-                <LogoIcon className="h-7 w-7" />
-              </span>
-              <div>
-                <h1 className="font-display text-xl leading-none tracking-tight">
+        <header className="sticky top-0 z-30 border-b border-line bg-paper-50">
+          <div className="mx-auto flex max-w-[1500px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-2.5">
+              <LogoIcon className="h-7 w-7 text-ink-900" />
+              <div className="flex items-baseline gap-2.5">
+                <h1 className="font-display text-[18px] font-semibold leading-none tracking-[-0.01em]">
                   PocketMod
                 </h1>
-                <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.16em] text-ink-500">
+                <p className="hidden text-[11px] leading-none text-ink-500 sm:block">
                   Ocho páginas en una hoja
                 </p>
               </div>
             </div>
 
             <div className="ml-auto flex flex-wrap items-center gap-2">
-              <div className="mr-1 hidden items-center gap-3 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-500 md:flex">
+              <p className="mr-1 hidden items-center gap-2 text-[11px] text-ink-500 md:flex">
                 {hasText && result ? (
                   <>
-                    <span>{result.totalTextPages} pág.</span>
-                    <span className="h-3 w-px bg-line" />
+                    <span className="tabular-nums">
+                      {result.totalTextPages}{' '}
+                      {result.totalTextPages === 1
+                        ? 'página con texto'
+                        : 'páginas con texto'}
+                    </span>
+                    <span className="text-ink-400">·</span>
                     <span>
                       {bookletCount}{' '}
                       {bookletCount === 1 ? 'cuadernillo' : 'cuadernillos'}
@@ -201,12 +211,13 @@ export function App() {
                 ) : (
                   <span>Sin texto</span>
                 )}
-              </div>
+              </p>
 
               <button
+                ref={foldButtonRef}
                 type="button"
                 onClick={() => setFoldGuideOpen(true)}
-                className="inline-flex items-center gap-2 rounded-lg border border-line bg-paper-50 px-3 py-2 text-xs font-semibold text-ink-700 transition hover:border-ink-400 hover:bg-paper-100"
+                className="inline-flex h-9 items-center gap-2 rounded-lg border border-line bg-paper-50 px-3 text-[12px] font-medium text-ink-700 transition-colors hover:border-ink-400 hover:text-ink-900"
               >
                 <FoldIcon className="h-4 w-4" />
                 Cómo doblar
@@ -216,7 +227,7 @@ export function App() {
                 type="button"
                 onClick={handlePrint}
                 disabled={!hasText}
-                className="inline-flex items-center gap-2 rounded-lg bg-ink-900 px-3.5 py-2 text-xs font-semibold text-paper-50 shadow-sm transition hover:bg-ink-800 disabled:cursor-not-allowed disabled:opacity-40"
+                className="inline-flex h-9 items-center gap-2 rounded-lg bg-ink-900 px-3.5 text-[12px] font-medium text-paper-50 transition-colors hover:bg-ink-800 disabled:cursor-not-allowed disabled:bg-paper-200 disabled:text-ink-600 disabled:hover:bg-paper-200"
               >
                 <PrinterIcon className="h-4 w-4" />
                 Imprimir
@@ -225,8 +236,8 @@ export function App() {
           </div>
         </header>
 
-        <main className="mx-auto grid max-w-[1500px] gap-4 px-4 py-4 sm:px-6 sm:py-5 lg:grid-cols-[minmax(340px,390px)_minmax(0,1fr)] lg:items-start lg:gap-5">
-          <div className="space-y-4 lg:sticky lg:top-[76px]">
+        <main className="mx-auto grid max-w-[1500px] gap-5 px-4 py-5 sm:px-6 lg:grid-cols-[minmax(320px,360px)_minmax(0,1fr)] lg:items-start lg:gap-6 lg:px-8 xl:grid-cols-[minmax(360px,420px)_minmax(0,1fr)]">
+          <aside className="overflow-hidden rounded-[10px] border border-line bg-paper-50">
             <EditorPanel
               text={text}
               onChange={setText}
@@ -244,7 +255,7 @@ export function App() {
               bookletCount={bookletCount}
               onReset={handleResetSettings}
             />
-          </div>
+          </aside>
 
           <Preview
             result={result}
@@ -259,20 +270,22 @@ export function App() {
           />
         </main>
 
-        <footer className="mx-auto max-w-[1500px] px-4 pb-6 pt-1 sm:px-6">
-          <p className="border-t border-line pt-4 text-center text-[11px] leading-relaxed text-ink-500">
-            Una hoja, {PAGES_PER_BOOKLET} páginas y un solo corte. Imprime al
-            100 % en {paper.label} horizontal; el texto se guarda solo en este
-            navegador.
-          </p>
+        <footer className="mx-auto max-w-[1500px] px-4 pb-8 pt-1 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-1 border-t border-line pt-4 text-[11px] leading-relaxed text-ink-500 sm:flex-row sm:items-baseline sm:justify-between">
+            <p>
+              Una hoja, {PAGES_PER_BOOKLET} páginas y un solo corte. Imprime al
+              100 % en {paper.label} horizontal.
+            </p>
+            <p className="text-ink-500">
+              El texto se guarda solo en este navegador.
+            </p>
+          </div>
         </footer>
       </div>
 
       <PrintRoot result={result} settings={settings} />
 
-      {foldGuideOpen ? (
-        <FoldGuide onClose={() => setFoldGuideOpen(false)} />
-      ) : null}
+      {foldGuideOpen ? <FoldGuide onClose={closeFoldGuide} /> : null}
     </>
   );
 }

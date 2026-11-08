@@ -13,46 +13,47 @@ interface MarkdownEditorProps {
   className?: string;
 }
 
-const PLACEHOLDER =
-  '# Título del cuadernillo\n\nPega aquí tu texto en **Markdown**: títulos, listas, negritas, enlaces...';
+const PLACEHOLDER = 'Escribe o pega tu texto en Markdown…';
 
 const READING_FONT =
   "'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif";
 
 /**
- * Palette that matches the paper UI. OverType turns these keys into the CSS
- * custom properties its injected stylesheet consumes.
+ * Neutral palette for the editor chrome. The document text keeps the serif
+ * reading face, while links and the caret carry the product's one accent.
+ * OverType turns these keys into the CSS custom properties its injected
+ * stylesheet consumes.
  */
 const THEME: Theme = {
   name: 'pocket',
   colors: {
-    bgPrimary: '#fdfbf6',
-    bgSecondary: '#fdfbf6',
-    text: '#1f1c16',
-    textPrimary: '#1f1c16',
-    textSecondary: '#5d5446',
-    placeholder: '#9b9180',
-    strong: '#1f1c16',
-    em: '#433c30',
-    h1: '#1f1c16',
-    h2: '#2f2a21',
-    h3: '#433c30',
+    bgPrimary: '#ffffff',
+    bgSecondary: '#ffffff',
+    text: '#0a0a0a',
+    textPrimary: '#0a0a0a',
+    textSecondary: '#4f4f4f',
+    placeholder: '#6b6b6b',
+    strong: '#0a0a0a',
+    em: '#333333',
+    h1: '#0a0a0a',
+    h2: '#0a0a0a',
+    h3: '#1a1a1a',
     link: '#8d3822',
-    code: '#8d3822',
-    codeBg: '#f2ecdf',
-    blockquote: '#5d5446',
-    hr: '#d8cfbe',
-    listMarker: '#786e5d',
-    syntaxMarker: 'rgba(93, 84, 70, 0.5)',
+    code: '#333333',
+    codeBg: '#f2f2f2',
+    blockquote: '#4f4f4f',
+    hr: '#d9d9d9',
+    listMarker: '#6b6b6b',
+    syntaxMarker: 'rgba(0, 0, 0, 0.4)',
     cursor: '#b24a2e',
     selection: 'rgba(178, 74, 46, 0.16)',
-    border: '#d8cfbe',
-    primary: '#b24a2e',
-    toolbarBg: '#f5f0e6',
-    toolbarBorder: '#d8cfbe',
-    toolbarIcon: '#5d5446',
-    toolbarHover: '#e9e1d2',
-    toolbarActive: '#e9e1d2',
+    border: '#e0e0e0',
+    primary: '#0a0a0a',
+    toolbarBg: '#f6f6f6',
+    toolbarBorder: '#e0e0e0',
+    toolbarIcon: '#4f4f4f',
+    toolbarHover: '#ececec',
+    toolbarActive: '#e0e0e0',
   },
 };
 
@@ -158,7 +159,7 @@ export function MarkdownEditor({
         aria-label="Texto del cuadernillo"
         placeholder={PLACEHOLDER}
         spellCheck
-        className={`${className ?? ''} resize-y bg-paper-50 px-4 py-4 text-[14.5px] leading-[1.65] text-ink-900 outline-none placeholder:text-ink-500/80`}
+        className={`${className ?? ''} resize-y bg-paper-50 px-4 py-4 text-[14.5px] leading-[1.65] text-ink-900 outline-none placeholder:text-ink-500`}
         style={{ fontFamily: 'var(--font-reading)' }}
       />
     );

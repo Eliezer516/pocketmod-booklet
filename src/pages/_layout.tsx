@@ -11,8 +11,15 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         name="description"
         content="Convierte un texto largo en un cuadernillo PocketMod de ocho páginas en una sola hoja. Listo para imprimir en casa."
       />
-      <meta name="theme-color" content="#f5f0e6" />
-      <link rel="icon" type="image/png" href="/images/favicon.png" />
+      <meta name="theme-color" content="#f6f6f6" />
+      <link rel="icon" href="/images/favicon.svg" type="image/svg+xml" />
+      <link
+        rel="icon"
+        href="/images/favicon.png"
+        sizes="32x32"
+        type="image/png"
+      />
+      <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
       {children}
     </div>
   );

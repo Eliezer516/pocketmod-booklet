@@ -19,23 +19,22 @@ export function EditorPanel({
   onClear,
 }: EditorPanelProps) {
   return (
-    <section className="overflow-hidden rounded-xl border border-line bg-paper-50 shadow-sm">
-      <div className="flex items-start justify-between gap-3 border-b border-line px-4 py-3">
-        <div>
-          <p className="eyebrow">Entrada</p>
-          <div className="flex items-center gap-2">
-            <h2 className="font-display text-xl leading-tight">Tu texto</h2>
-            <span className="hidden rounded border border-line bg-paper-100 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-ink-500 sm:inline">
-              Markdown
-            </span>
-          </div>
+    <section>
+      <div className="flex items-start justify-between gap-3 border-b border-line px-4 py-3 sm:px-5">
+        <div className="flex items-center gap-2">
+          <h2 className="font-display text-[15px] font-semibold leading-tight">
+            Tu texto
+          </h2>
+          <span className="hidden rounded border border-line px-1.5 py-0.5 text-[10px] font-medium leading-none text-ink-500 sm:inline">
+            Markdown
+          </span>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={onSample}
-            className="inline-flex items-center gap-1.5 rounded-md border border-line bg-paper-100 px-2.5 py-1.5 text-[11px] font-semibold text-ink-700 transition hover:border-ink-400 hover:bg-paper-200"
+            className="inline-flex h-8 items-center gap-1.5 rounded-md border border-line bg-paper-50 px-2.5 text-[11px] font-medium text-ink-700 transition-colors hover:bg-paper-100 hover:text-ink-900"
           >
             <SparkIcon className="h-3.5 w-3.5" />
             Ejemplo
@@ -44,7 +43,7 @@ export function EditorPanel({
             type="button"
             onClick={onClear}
             disabled={text.length === 0}
-            className="inline-flex items-center gap-1.5 rounded-md border border-transparent px-2 py-1.5 text-[11px] font-semibold text-ink-500 transition hover:border-line hover:bg-paper-100 hover:text-ink-900 disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-[11px] font-medium text-ink-500 transition-colors hover:bg-paper-100 hover:text-red-700 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <TrashIcon className="h-3.5 w-3.5" />
             Limpiar
@@ -55,15 +54,17 @@ export function EditorPanel({
       <MarkdownEditor
         value={text}
         onChange={onChange}
-        className="h-[300px] w-full bg-paper-50 sm:h-[320px] lg:h-[340px]"
+        className="h-[320px] w-full bg-paper-50 sm:h-[340px] lg:h-[380px]"
       />
 
-      <div className="flex items-center gap-3 border-t border-line px-4 py-2 font-mono text-[10px] uppercase tracking-[0.08em] text-ink-500">
-        <span className="whitespace-nowrap">
+      <div className="flex items-center gap-2 border-t border-line px-4 py-2 text-[11px] text-ink-500">
+        <span className="whitespace-nowrap tabular-nums">
           {words.toLocaleString('es')} palabras
         </span>
-        <span className="h-3 w-px shrink-0 bg-line" />
-        <span className="whitespace-nowrap">
+        <span aria-hidden="true" className="text-ink-400">
+          ·
+        </span>
+        <span className="whitespace-nowrap tabular-nums">
           {characters.toLocaleString('es')} caracteres
         </span>
         <span className="ml-auto hidden whitespace-nowrap text-ink-500 2xl:inline">

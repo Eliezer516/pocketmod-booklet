@@ -31,7 +31,7 @@ export function PageCard({ page, settings, fontSizePt }: PageCardProps) {
         flexDirection: 'column',
         padding: `${settings.marginMm}mm`,
         background: '#ffffff',
-        color: '#17150f',
+        color: '#0a0a0a',
         fontFamily: FONT_STACKS[settings.font],
         fontSize: `${fontSizePt}pt`,
         lineHeight: settings.lineHeight,
@@ -63,7 +63,7 @@ export function PageCard({ page, settings, fontSizePt }: PageCardProps) {
             fontSize: '6.5pt',
             lineHeight: 1,
             letterSpacing: '0.14em',
-            color: '#8a8172',
+            color: '#767676',
           }}
         >
           {page.pageNumber}

@@ -3,6 +3,7 @@ import { CloseIcon, FoldIcon } from './icons';
 
 export function FoldGuide({ onClose }: { onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -10,7 +11,30 @@ export function FoldGuide({ onClose }: { onClose: () => void }) {
     closeRef.current?.focus();
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+
+      // Keep keyboard focus inside the dialog while it is open.
+      const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusable || focusable.length === 0) return;
+      const first = focusable[0]!;
+      const last = focusable[focusable.length - 1]!;
+      const active = document.activeElement;
+
+      if (event.shiftKey) {
+        if (active === first || !dialogRef.current?.contains(active)) {
+          event.preventDefault();
+          last.focus();
+        }
+      } else if (active === last || !dialogRef.current?.contains(active)) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener('keydown', onKeyDown);
 
@@ -22,26 +46,27 @@ export function FoldGuide({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/45 p-4 backdrop-blur-[2px]"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
     >
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="fold-guide-title"
-        className="max-h-[92svh] w-full max-w-lg overflow-auto rounded-xl border border-line bg-paper-50 shadow-2xl"
+        className="max-h-[92svh] w-full max-w-lg overflow-auto rounded-[10px] border border-line bg-paper-50 shadow-[0_24px_48px_-24px_rgb(0_0_0_/_0.4)]"
       >
         <div className="flex items-start justify-between gap-4 border-b border-line px-5 py-4">
-          <div className="flex items-start gap-3">
-            <span className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-lg bg-accent-600/10 text-accent-700">
-              <FoldIcon className="h-5 w-5" />
-            </span>
+          <div className="flex items-start gap-2.5">
+            <FoldIcon className="mt-0.5 h-5 w-5 shrink-0 text-ink-700" />
             <div>
-              <p className="eyebrow">Instrucciones</p>
-              <h2 id="fold-guide-title" className="font-display text-2xl">
+              <h2
+                id="fold-guide-title"
+                className="font-display text-xl font-semibold leading-tight"
+              >
                 Cómo doblar tu PocketMod
               </h2>
             </div>
@@ -51,7 +76,7 @@ export function FoldGuide({ onClose }: { onClose: () => void }) {
             type="button"
             onClick={onClose}
             aria-label="Cerrar instrucciones"
-            className="rounded-md p-1.5 text-ink-500 transition hover:bg-paper-100 hover:text-ink-900"
+            className="-mr-1.5 -mt-1 rounded-md p-1.5 text-ink-500 transition-colors hover:bg-paper-100 hover:text-ink-900"
           >
             <CloseIcon className="h-5 w-5" />
           </button>
@@ -60,12 +85,12 @@ export function FoldGuide({ onClose }: { onClose: () => void }) {
         <div className="space-y-5 px-5 py-5">
           <FoldDiagram />
 
-          <p className="rounded-lg border border-line bg-paper-100 px-3 py-2.5 text-xs leading-relaxed text-ink-600">
+          <p className="rounded-lg border border-line bg-paper-100 px-3 py-2.5 text-[12px] leading-relaxed text-ink-600">
             La fila inferior de la hoja aparece girada 180°. Es correcto: al
             doblar, esas páginas quedarán hacia fuera.
           </p>
 
-          <ol className="space-y-4">
+          <ol className="space-y-3.5">
             <Step number={1}>
               Imprime en una sola cara, horizontal y al 100 %. Desactiva
               “ajustar a la página”, los márgenes y los encabezados del
@@ -85,8 +110,8 @@ export function FoldGuide({ onClose }: { onClose: () => void }) {
             </Step>
           </ol>
 
-          <p className="rounded-lg border border-accent-600/25 bg-accent-600/5 px-3 py-2.5 text-xs leading-relaxed text-ink-700">
-            <strong className="font-semibold text-ink-900">
+          <p className="rounded-lg border border-ink-900/20 bg-paper-50 px-3 py-2.5 text-[12px] leading-relaxed text-ink-600">
+            <strong className="font-medium text-ink-900">
               ¿La impresora recorta los bordes?
             </strong>{' '}
             Activa «Guías de doblez», imprime con «ajustar a los márgenes de la
@@ -97,7 +122,7 @@ export function FoldGuide({ onClose }: { onClose: () => void }) {
           <button
             type="button"
             onClick={onClose}
-            className="w-full rounded-lg bg-ink-900 px-4 py-2.5 text-sm font-semibold text-paper-50 transition hover:bg-ink-800"
+            className="w-full rounded-lg bg-ink-900 px-4 py-2.5 text-[13px] font-medium text-paper-50 transition-colors hover:bg-ink-800"
           >
             Entendido
           </button>
@@ -116,10 +141,10 @@ function Step({
 }) {
   return (
     <li className="flex gap-3">
-      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-accent-600/30 bg-accent-600/10 font-mono text-[11px] font-semibold text-accent-700">
+      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-line bg-paper-50 text-[11px] font-medium tabular-nums text-ink-600">
         {number}
       </span>
-      <p className="pt-0.5 text-[13px] leading-relaxed text-ink-700">
+      <p className="pt-0.5 text-[12px] leading-relaxed text-ink-700">
         {children}
       </p>
     </li>
@@ -139,8 +164,8 @@ function FoldDiagram() {
         y="34"
         width="320"
         height="145"
-        fill="#fffdf8"
-        stroke="#211e18"
+        fill="#ffffff"
+        stroke="#0a0a0a"
         strokeWidth="1.4"
       />
       <line
@@ -157,7 +182,7 @@ function FoldDiagram() {
         y1="34"
         x2="110"
         y2="179"
-        stroke="#9a917f"
+        stroke="#8f8f8f"
         strokeWidth="1"
         strokeDasharray="3 4"
       />
@@ -166,7 +191,7 @@ function FoldDiagram() {
         y1="34"
         x2="190"
         y2="179"
-        stroke="#9a917f"
+        stroke="#8f8f8f"
         strokeWidth="1"
         strokeDasharray="3 4"
       />
@@ -175,7 +200,7 @@ function FoldDiagram() {
         y1="34"
         x2="270"
         y2="179"
-        stroke="#9a917f"
+        stroke="#8f8f8f"
         strokeWidth="1"
         strokeDasharray="3 4"
       />
@@ -192,23 +217,23 @@ function FoldDiagram() {
         x="190"
         y="202"
         textAnchor="middle"
-        fontFamily="ui-monospace, monospace"
-        fontSize="9"
-        letterSpacing="1.4"
-        fill="#6d6558"
+        fontFamily="ui-sans-serif, system-ui, sans-serif"
+        fontSize="10"
+        letterSpacing="0.3"
+        fill="#6b6b6b"
       >
-        CORTE EN EL PLIEGUE CENTRAL
+        Corte en el pliegue central
       </text>
       <text
         x="190"
         y="24"
         textAnchor="middle"
-        fontFamily="ui-monospace, monospace"
-        fontSize="9"
-        letterSpacing="1.4"
-        fill="#6d6558"
+        fontFamily="ui-sans-serif, system-ui, sans-serif"
+        fontSize="10"
+        letterSpacing="0.3"
+        fill="#6b6b6b"
       >
-        IMPRESIÓN HACIA FUERA
+        Impresión hacia fuera
       </text>
       <path
         d="M344 118c12 0 18 7 18 17"

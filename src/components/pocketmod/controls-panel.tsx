@@ -28,22 +28,21 @@ export function ControlsPanel({
   onReset,
 }: ControlsPanelProps) {
   return (
-    <section className="rounded-xl border border-line bg-paper-50 shadow-sm">
-      <div className="flex items-start justify-between gap-3 border-b border-line px-4 py-3">
-        <div>
-          <p className="eyebrow">Ajustes</p>
-          <h2 className="font-display text-xl leading-tight">Formato</h2>
-        </div>
+    <section>
+      <div className="flex items-start justify-between gap-3 px-4 pb-3 pt-5 sm:px-5">
+        <h2 className="font-display text-[15px] font-semibold leading-tight">
+          Formato
+        </h2>
         <button
           type="button"
           onClick={onReset}
-          className="rounded-md px-2 py-1.5 text-[11px] font-semibold text-ink-500 transition hover:bg-paper-100 hover:text-ink-900"
+          className="rounded-md px-2 py-1 text-[11px] font-medium text-ink-500 transition-colors hover:bg-paper-100 hover:text-ink-900"
         >
           Restablecer
         </button>
       </div>
 
-      <div className="space-y-5 px-4 py-4">
+      <div className="space-y-5 px-4 pb-5 sm:px-5">
         <Field label="Papel">
           <Segmented<PaperId>
             value={settings.paper}
@@ -96,7 +95,7 @@ export function ControlsPanel({
         />
 
         {shrunk ? (
-          <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] leading-relaxed text-amber-900">
+          <p className="rounded-md border border-amber-300/70 bg-amber-50 px-3 py-2 text-[11px] leading-relaxed text-amber-900">
             Letra ajustada a {usedFontSizePt.toFixed(1)} pt{' '}
             {bookletCount > 1
               ? 'para reducir el número de páginas.'
@@ -105,7 +104,7 @@ export function ControlsPanel({
         ) : null}
 
         <details className="group border-t border-line pt-4">
-          <summary className="flex cursor-pointer list-none items-center gap-2 text-[11px] font-semibold text-ink-700 marker:hidden">
+          <summary className="flex cursor-pointer list-none items-center gap-2 text-[11px] font-medium text-ink-600 transition-colors hover:text-ink-900 marker:hidden">
             <ChevronIcon className="h-4 w-4 transition-transform group-open:rotate-180" />
             Opciones avanzadas
           </summary>
@@ -181,9 +180,9 @@ function Segmented<T extends string>({
             type="button"
             aria-pressed={active}
             onClick={() => onChange(option.value)}
-            className={`flex-1 rounded-md px-2 py-1.5 text-[11px] font-semibold transition ${
+            className={`flex-1 rounded-md px-2 py-1.5 text-[11px] font-medium transition-colors ${
               active
-                ? 'bg-ink-900 text-paper-50 shadow-sm'
+                ? 'bg-ink-900 text-paper-50'
                 : 'text-ink-600 hover:text-ink-900'
             }`}
           >
@@ -221,9 +220,9 @@ function Slider({
         <label htmlFor={id} className="eyebrow">
           {label}
         </label>
-        <span className="font-mono text-[10px] text-ink-700">
+        <span className="text-[11px] tabular-nums text-ink-600">
           {format ? format(value) : value}
-          {suffix}
+          {suffix ? ` ${suffix}` : ''}
         </span>
       </div>
       <input
@@ -254,7 +253,7 @@ function Toggle({
   return (
     <div className="flex items-start justify-between gap-4">
       <div>
-        <p className="text-[12px] font-semibold text-ink-800">{label}</p>
+        <p className="text-[12px] font-medium text-ink-800">{label}</p>
         {description ? (
           <p className="mt-0.5 text-[11px] leading-relaxed text-ink-500">
             {description}
@@ -267,9 +266,9 @@ function Toggle({
         aria-checked={checked}
         aria-label={label}
         onClick={() => onChange(!checked)}
-        className={`relative mt-0.5 h-5 w-9 shrink-0 rounded-full border transition ${
+        className={`relative mt-0.5 h-5 w-9 shrink-0 rounded-full border transition-colors ${
           checked
-            ? 'border-accent-600 bg-accent-600'
+            ? 'border-ink-900 bg-ink-900'
             : 'border-line bg-paper-200'
         }`}
       >

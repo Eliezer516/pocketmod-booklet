@@ -52,8 +52,8 @@ export function Preview({
   const bookletCount = result?.booklets.length ?? 1;
 
   return (
-    <section className="flex min-h-[640px] flex-col overflow-hidden rounded-xl border border-line bg-paper-50 shadow-[0_18px_45px_-30px_rgba(31,28,22,0.45)]">
-      <div className="flex flex-wrap items-center gap-3 border-b border-line px-4 py-3">
+    <section className="flex min-h-[420px] flex-col overflow-hidden rounded-[10px] border border-line bg-paper-50 sm:min-h-[640px]">
+      <div className="flex flex-wrap items-center gap-3 border-b border-line px-4 py-3 sm:px-5">
         <div className="inline-flex rounded-lg border border-line bg-paper-100 p-1">
           <ModeButton
             active={mode === 'pages'}
@@ -71,19 +71,17 @@ export function Preview({
 
         {bookletCount > 1 ? (
           <div className="flex items-center gap-1.5">
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink-500">
-              Cuadernillo
-            </span>
+            <span className="text-[11px] text-ink-500">Cuadernillo</span>
             {Array.from({ length: bookletCount }, (_, index) => (
               <button
                 key={index}
                 type="button"
                 aria-pressed={index === activeBooklet}
                 onClick={() => onBookletChange(index)}
-                className={`h-7 min-w-7 rounded-md border px-1.5 font-mono text-[11px] transition ${
+                className={`h-7 min-w-7 rounded-md border px-1.5 text-[11px] font-medium tabular-nums transition-colors ${
                   index === activeBooklet
                     ? 'border-ink-900 bg-ink-900 text-paper-50'
-                    : 'border-line bg-paper-50 text-ink-600 hover:border-ink-400'
+                    : 'border-line bg-paper-50 text-ink-600 hover:border-ink-400 hover:text-ink-900'
                 }`}
               >
                 {index + 1}
@@ -92,30 +90,34 @@ export function Preview({
           </div>
         ) : null}
 
-        <div className="ml-auto flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-500">
+        <div
+          className={`ml-auto items-center gap-2 text-[11px] text-ink-500 ${
+            busy ? 'flex' : 'hidden sm:flex'
+          }`}
+        >
           {busy ? (
             <>
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent-600" />
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-ink-400" />
               Calculando
             </>
           ) : (
             <>
               <span>{paper.shortLabel} horizontal</span>
-              <span className="h-3 w-px bg-line" />
-              <span>{fontSizePt.toFixed(1)} pt</span>
+              <span className="text-ink-400">·</span>
+              <span className="tabular-nums">{fontSizePt.toFixed(1)} pt</span>
             </>
           )}
         </div>
       </div>
 
       {error ? (
-        <div className="border-b border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-800">
+        <div className="border-b border-red-200 bg-red-50 px-4 py-2.5 text-[12px] text-red-800">
           {error}
         </div>
       ) : null}
 
       {!error && result?.shrunk ? (
-        <div className="border-b border-amber-200 bg-amber-50 px-4 py-2.5 text-xs leading-relaxed text-amber-900">
+        <div className="border-b border-amber-200 bg-amber-50 px-4 py-2.5 text-[12px] leading-relaxed text-amber-900">
           El texto no cabía a {settings.fontSizePt.toFixed(1)} pt. Se ajustó
           automáticamente a {result.usedFontSizePt.toFixed(1)} pt para{' '}
           {bookletCount > 1
@@ -125,18 +127,18 @@ export function Preview({
       ) : null}
 
       {!error && bookletCount > 1 ? (
-        <div className="border-b border-line bg-paper-100 px-4 py-2.5 text-xs leading-relaxed text-ink-600">
+        <div className="border-b border-line bg-paper-100 px-4 py-2.5 text-[12px] leading-relaxed text-ink-600">
           El texto ocupa{' '}
-          <strong className="font-semibold text-ink-900">
+          <strong className="font-medium text-ink-900">
             {bookletCount} cuadernillos
           </strong>
           . Al imprimir saldrán todas las hojas en orden.
         </div>
       ) : null}
 
-      <div className="flex-1 overflow-auto p-4 lg:p-6">
+      <div className="flex-1 overflow-auto bg-paper-100 p-4 lg:p-6">
         {!hasText ? (
-          <p className="mb-4 rounded-lg border border-dashed border-line bg-paper-100/60 px-4 py-3 text-sm text-ink-600">
+          <p className="mb-4 rounded-lg border border-dashed border-line bg-paper-50 px-4 py-3 text-[12px] text-ink-600">
             Escribe o pega tu texto en el editor. El cuadernillo se actualiza
             solo, página a página.
           </p>
@@ -176,9 +178,9 @@ function ModeButton({
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className={`rounded-md px-3 py-1.5 text-xs font-semibold transition ${
+      className={`rounded-md px-3 py-1.5 text-[12px] font-medium transition-colors ${
         active
-          ? 'bg-ink-900 text-paper-50 shadow-sm'
+          ? 'bg-ink-900 text-paper-50'
           : 'text-ink-600 hover:text-ink-900'
       }`}
     >
@@ -201,7 +203,7 @@ function PagesView({
   const { ref, width } = useElementWidth<HTMLDivElement>();
   const pageWidthPx = mmToPx(panelWidthMm(paper));
   const pageHeightPx = mmToPx(panelHeightMm(paper));
-  const columns = width >= 880 ? 4 : width >= 620 ? 3 : 2;
+  const columns = width >= 880 ? 4 : width >= 440 ? 2 : 1;
   const gap = width >= 620 ? 20 : 12;
   const available = Math.max(0, width - gap * (columns - 1));
   const scale = width
@@ -242,12 +244,12 @@ function PagesView({
               </div>
             </div>
             <figcaption className="mt-2 flex items-center gap-2">
-              <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-ink-500">
+              <span className="text-[11px] tabular-nums text-ink-500">
                 Página {index + 1}
               </span>
-              <span className="h-1 flex-1 overflow-hidden rounded-full bg-paper-200">
+              <span className="h-0.5 flex-1 overflow-hidden rounded-full bg-paper-200">
                 <span
-                  className="block h-full rounded-full bg-accent-600/70 transition-[width] duration-300"
+                  className="block h-full rounded-full bg-ink-900/60 transition-[width] duration-300"
                   style={{ width: `${Math.round(page.fill * 100)}%` }}
                 />
               </span>
@@ -256,7 +258,7 @@ function PagesView({
         ))}
       </div>
 
-      <p className="mt-6 text-center text-xs leading-relaxed text-ink-500">
+      <p className="mt-6 text-center text-[11px] leading-relaxed text-ink-500">
         La página 1 es la portada y la 8 la contraportada. Las líneas se cortan
         en límites de palabra para que nada se parta al doblar.
       </p>
@@ -302,15 +304,18 @@ function SheetView({
         </div>
       </div>
 
-      <p className="mt-5 text-center text-xs leading-relaxed text-ink-500">
+      <p className="mt-5 text-center text-[11px] leading-relaxed text-ink-500">
         Esta es la hoja que se imprime: una cara, {paper.label} horizontal y
         escala 100 %. La fila inferior se ve girada a propósito.
       </p>
       {settings.guides ? (
-        <p className="mx-auto mt-2 max-w-xl text-center text-xs leading-relaxed text-accent-700">
-          Marco exterior activo: si tu impresora no imprime hasta el borde,
-          activa «ajustar a los márgenes de la impresora» y recorta siguiendo
-          la línea exterior antes de doblar.
+        <p className="mx-auto mt-2 max-w-xl text-center text-[11px] leading-relaxed text-ink-600">
+          <strong className="font-medium text-ink-900">
+            Marco exterior activo.
+          </strong>{' '}
+          Si tu impresora no imprime hasta el borde, activa «ajustar a los
+          márgenes de la impresora» y recorta siguiendo la línea exterior antes
+          de doblar.
         </p>
       ) : null}
     </div>
