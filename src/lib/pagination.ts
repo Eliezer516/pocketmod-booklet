@@ -1,18 +1,8 @@
 import { PAGES_PER_BOOKLET } from './imposition';
 import { markdownWordCount, renderMarkdown } from './markdown';
-import {
-  PAPERS,
-  PT_TO_PX,
-  mmToPx,
-  panelHeightMm,
-  panelWidthMm,
-} from './paper';
-import {
-  FOOTER_RESERVE_MM,
-  FONT_STACKS,
-  MIN_AUTO_FONT_PT,
-  type Settings,
-} from './settings';
+import { pageImageReserves, pageMetrics, type PageImages } from './page-images';
+import { PT_TO_PX } from './paper';
+import { FONT_STACKS, MIN_AUTO_FONT_PT, type Settings } from './settings';
 
 export interface PageData {
   html: string;
@@ -101,6 +91,7 @@ function createPage(
   page.style.lineHeight = String(settings.lineHeight);
   page.style.textAlign = settings.justify ? 'justify' : 'left';
   page.style.setProperty('--page-content-height', `${contentHeightPx}px`);
+  page.setAttribute('data-image-align', settings.imageAlign);
   host.appendChild(page);
   return page;
 }
@@ -374,18 +365,10 @@ function paginateBlocks(
   settings: Settings,
   fontSizePt: number,
   maxPages: number,
+  imageReserves: readonly number[],
 ): PaginatedPages {
-  const paper = PAPERS[settings.paper];
-  const contentWidthPx = Math.max(
-    40,
-    mmToPx(panelWidthMm(paper) - settings.marginMm * 2) - SAFETY_PX,
-  );
-  const footerReserve = settings.pageNumbers ? FOOTER_RESERVE_MM : 0;
-  const contentHeightPx = Math.max(
-    40,
-    mmToPx(panelHeightMm(paper) - settings.marginMm * 2 - footerReserve) -
-      SAFETY_PX,
-  );
+  const { widthPx: contentWidthPx, heightPx: contentHeightPx } =
+    pageMetrics(settings);
   const fontSizePx = fontSizePt * PT_TO_PX;
 
   const host = createHost();
@@ -396,12 +379,18 @@ function paginateBlocks(
 
   try {
     while (pending.length > 0 && pages.length < maxPages) {
+      // A page image reserves part of the printable area before text is laid
+      // out, so the paginator must measure against the remaining height.
+      const reserved =
+        imageReserves[pages.length % PAGES_PER_BOOKLET] ?? 0;
+      const pageHeightPx = Math.max(24, contentHeightPx - reserved);
+
       const page = createPage(
         host,
         settings,
         fontSizePx,
         contentWidthPx,
-        contentHeightPx,
+        pageHeightPx,
       );
       const lineHeightPx = fontSizePx * settings.lineHeight;
 
@@ -413,14 +402,14 @@ function paginateBlocks(
         if (
           isHeading &&
           page.children.length > 0 &&
-          contentHeightPx - page.scrollHeight < lineHeightPx * 3
+          pageHeightPx - page.scrollHeight < lineHeightPx * 3
         ) {
           break;
         }
 
         page.appendChild(node);
 
-        if (page.scrollHeight <= contentHeightPx + 0.5) {
+        if (page.scrollHeight <= pageHeightPx + 0.5) {
           pending.shift();
           continue;
         }
@@ -434,10 +423,10 @@ function paginateBlocks(
 
         const split =
           node.tagName === 'UL' || node.tagName === 'OL'
-            ? splitListToFit(node, page, contentHeightPx)
+            ? splitListToFit(node, page, pageHeightPx)
             : node.tagName === 'TABLE'
-              ? splitTableToFit(node, page, contentHeightPx)
-              : splitNodeToFit(node, page, contentHeightPx);
+              ? splitTableToFit(node, page, pageHeightPx)
+              : splitNodeToFit(node, page, pageHeightPx);
 
         if (split) {
           page.replaceChild(split.before, node);
@@ -463,7 +452,7 @@ function paginateBlocks(
 
       pages.push({
         html: page.innerHTML,
-        fill: Math.min(1, page.scrollHeight / contentHeightPx),
+        fill: Math.min(1, page.scrollHeight / pageHeightPx),
       });
       page.remove();
     }
@@ -474,7 +463,11 @@ function paginateBlocks(
   return { pages, overflow: pending.length > 0 };
 }
 
-export function paginateText(raw: string, settings: Settings): PaginationResult {
+export function paginateText(
+  raw: string,
+  settings: Settings,
+  pageImages: PageImages = {},
+): PaginationResult {
   if (typeof document === 'undefined') return blankResult(settings);
 
   const source = normalizeMarkdown(raw);
@@ -494,6 +487,7 @@ export function paginateText(raw: string, settings: Settings): PaginationResult 
     candidates.push(MIN_AUTO_FONT_PT);
   }
 
+  const imageReserves = pageImageReserves(settings, pageImages);
   let usedPt = candidates[0] ?? basePt;
   let chosen: PaginatedPages | null = null;
 
@@ -503,6 +497,7 @@ export function paginateText(raw: string, settings: Settings): PaginationResult 
       settings,
       pt,
       PAGES_PER_BOOKLET,
+      imageReserves,
     );
     if (!attempt.overflow) {
       chosen = attempt;
@@ -513,7 +508,13 @@ export function paginateText(raw: string, settings: Settings): PaginationResult 
 
   if (!chosen) {
     usedPt = MIN_AUTO_FONT_PT;
-    chosen = paginateBlocks(blocks, settings, usedPt, MAX_PAGES);
+    chosen = paginateBlocks(
+      blocks,
+      settings,
+      usedPt,
+      MAX_PAGES,
+      imageReserves,
+    );
   }
 
   const pages = chosen.pages;

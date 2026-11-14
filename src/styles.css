@@ -315,13 +315,50 @@
     font-weight: 700;
   }
 
-  .pocket-markdown img {
+  /*
+   * Uploaded images. `--page-content-height` caps them to the printable area
+   * of a page; the editor preview falls back to a smaller value.
+   */
+  .pocket-markdown img,
+  .overtype-wrapper .overtype-preview img {
     display: block;
     max-width: 100%;
     max-height: var(--page-content-height, 260px);
     height: auto;
-    margin: 0 auto;
     object-fit: contain;
+  }
+
+  .pocket-markdown[data-image-align='left'] img,
+  [data-image-align='left'] .overtype-wrapper .overtype-preview img {
+    margin: 0 auto 0 0;
+  }
+
+  .pocket-markdown[data-image-align='center'] img,
+  [data-image-align='center'] .overtype-wrapper .overtype-preview img {
+    margin: 0 auto;
+  }
+
+  .pocket-markdown[data-image-align='right'] img,
+  [data-image-align='right'] .overtype-wrapper .overtype-preview img {
+    margin: 0 0 0 auto;
+  }
+
+  /*
+   * Top and bottom align the image with the first or last text line of its
+   * paragraph, so it sits on the same line as the text instead of centred.
+   */
+  .pocket-markdown[data-image-align='top'] img,
+  [data-image-align='top'] .overtype-wrapper .overtype-preview img {
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 0.35em 0 0;
+  }
+
+  .pocket-markdown[data-image-align='bottom'] img,
+  [data-image-align='bottom'] .overtype-wrapper .overtype-preview img {
+    display: inline-block;
+    vertical-align: bottom;
+    margin: 0 0.35em 0 0;
   }
 }
 

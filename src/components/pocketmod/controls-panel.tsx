@@ -1,11 +1,32 @@
-import { useId, type ReactNode } from 'react';
+import {
+  useId,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+  type ReactNode,
+} from 'react';
+import {
+  encodeImageFile,
+  IMAGE_MIME_TYPES,
+  loadImageFromUrl,
+} from '../../lib/images';
+import {
+  PAGE_IMAGE_MAX_SCALE,
+  PAGE_IMAGE_MIN_SCALE,
+  pageImageScale,
+  type PageImage,
+  type PageImages,
+} from '../../lib/page-images';
 import { PAPERS, type PaperId } from '../../lib/paper';
 import {
   DEFAULT_SETTINGS,
   FONT_LABELS,
+  IMAGE_ALIGN_LABELS,
   MAX_FONT_PT,
   MIN_FONT_PT,
   type FontId,
+  type ImageAlign,
   type Settings,
 } from '../../lib/settings';
 import { ChevronIcon } from './icons';
@@ -13,6 +34,8 @@ import { ChevronIcon } from './icons';
 interface ControlsPanelProps {
   settings: Settings;
   onChange: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
+  pageImages: PageImages;
+  onPageImageChange: (page: number, image: PageImage | null) => void;
   usedFontSizePt: number;
   shrunk: boolean;
   bookletCount: number;
@@ -22,6 +45,8 @@ interface ControlsPanelProps {
 export function ControlsPanel({
   settings,
   onChange,
+  pageImages,
+  onPageImageChange,
   usedFontSizePt,
   shrunk,
   bookletCount,
@@ -64,6 +89,32 @@ export function ControlsPanel({
               { value: 'mono', label: FONT_LABELS.mono },
             ]}
           />
+        </Field>
+
+        <Field label="Alineación de imágenes">
+          <Segmented<ImageAlign>
+            value={settings.imageAlign}
+            onChange={(value) => onChange('imageAlign', value)}
+            options={[
+              { value: 'left', label: IMAGE_ALIGN_LABELS.left },
+              { value: 'center', label: IMAGE_ALIGN_LABELS.center },
+              { value: 'right', label: IMAGE_ALIGN_LABELS.right },
+              { value: 'top', label: IMAGE_ALIGN_LABELS.top },
+              { value: 'bottom', label: IMAGE_ALIGN_LABELS.bottom },
+            ]}
+          />
+        </Field>
+
+        <Field label="Imágenes por página">
+          <PageImageGrid
+            pageImages={pageImages}
+            onChange={onPageImageChange}
+          />
+          <p className="text-[11px] leading-relaxed text-ink-500">
+            Una imagen por cada página del cuadernillo. La alineación de arriba
+            decide dónde se coloca y el texto usa el espacio restante. El
+            deslizador ajusta el tamaño de cada imagen.
+          </p>
         </Field>
 
         <div className="grid grid-cols-2 gap-4">
@@ -146,6 +197,250 @@ export function ControlsPanel({
   );
 }
 
+const PAGE_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
+
+function PageImageGrid({
+  pageImages,
+  onChange,
+}: {
+  pageImages: PageImages;
+  onChange: (page: number, image: PageImage | null) => void;
+}) {
+  const inputs = useRef<Array<HTMLInputElement | null>>([]);
+  const [urlOpen, setUrlOpen] = useState(false);
+  const [url, setUrl] = useState('');
+  const [urlPage, setUrlPage] = useState(1);
+  const [busy, setBusy] = useState(false);
+  const [urlError, setUrlError] = useState<string | null>(null);
+  const [sizePage, setSizePage] = useState(1);
+  const imagePages = PAGE_NUMBERS.filter((page) => pageImages[page]);
+  const activePage = pageImages[sizePage] ? sizePage : imagePages[0];
+  const activeImage = activePage ? pageImages[activePage] : undefined;
+  const scalePercent = activeImage
+    ? Math.round(pageImageScale(activeImage) * 100)
+    : 100;
+
+  const toggleUrl = () => {
+    if (urlOpen) {
+      setUrlOpen(false);
+      return;
+    }
+    const firstEmpty = PAGE_NUMBERS.find((page) => !pageImages[page]);
+    setUrlPage(firstEmpty ?? 1);
+    setUrlError(null);
+    setUrlOpen(true);
+  };
+
+  const handleUrl = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const value = url.trim();
+    if (!value || busy) return;
+
+    setBusy(true);
+    setUrlError(null);
+    try {
+      const imported = await loadImageFromUrl(value);
+      onChange(urlPage, imported);
+      setUrl('');
+      setUrlOpen(false);
+    } catch (error) {
+      setUrlError(
+        error instanceof Error
+          ? error.message
+          : 'No se pudo cargar la imagen desde esa URL.',
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleFile = async (
+    event: ChangeEvent<HTMLInputElement>,
+    page: number,
+  ) => {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+    // Reset the input so choosing the same file again fires a change event.
+    input.value = '';
+    if (!file) return;
+
+    try {
+      const encoded = await encodeImageFile(file);
+      onChange(page, encoded);
+    } catch (error) {
+      console.error('Error al procesar la imagen', error);
+      window.alert(
+        'No se pudo cargar la imagen. Comprueba que el archivo sea una imagen válida.',
+      );
+    }
+  };
+
+  return (
+    <div className="space-y-1.5">
+      <div className="grid grid-cols-4 gap-1.5">
+        {PAGE_NUMBERS.map((page) => {
+          const image = pageImages[page];
+          return (
+            <div key={page} className="relative">
+              <button
+                type="button"
+                onClick={() => inputs.current[page]?.click()}
+                aria-label={
+                  image
+                    ? `Cambiar imagen de la página ${page}`
+                    : `Añadir imagen a la página ${page}`
+                }
+                className="flex h-14 w-full flex-col items-center justify-center overflow-hidden rounded-md border border-line bg-paper-50 p-1 text-ink-500 transition-colors hover:border-ink-400 hover:text-ink-900"
+              >
+                {image ? (
+                  <img
+                    src={image.src}
+                    alt=""
+                    className="max-h-9 max-w-full object-contain"
+                  />
+                ) : (
+                  <span
+                    aria-hidden="true"
+                    className="text-[17px] font-light leading-none"
+                  >
+                    +
+                  </span>
+                )}
+                <span className="mt-0.5 text-[9px] font-medium leading-none tabular-nums">
+                  P{page}
+                </span>
+              </button>
+
+              {image ? (
+                <button
+                  type="button"
+                  onClick={() => onChange(page, null)}
+                  aria-label={`Quitar imagen de la página ${page}`}
+                  className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full border border-line bg-paper-50 text-[11px] leading-none text-ink-600 shadow-sm transition-colors hover:text-red-700"
+                >
+                  ×
+                </button>
+              ) : null}
+
+              <input
+                ref={(node) => {
+                  inputs.current[page] = node;
+                }}
+                type="file"
+                accept={IMAGE_MIME_TYPES.join(',')}
+                className="sr-only"
+                tabIndex={-1}
+                aria-hidden="true"
+                onChange={(event) => {
+                  void handleFile(event, page);
+                }}
+              />
+            </div>
+          );
+        })}
+      </div>
+
+      <button
+        type="button"
+        onClick={toggleUrl}
+        aria-expanded={urlOpen}
+        className="text-[11px] font-medium text-ink-600 underline decoration-line underline-offset-2 transition-colors hover:text-ink-900"
+      >
+        {urlOpen ? 'Cancelar' : 'Añadir desde una URL'}
+      </button>
+
+      {urlOpen ? (
+        <form
+          onSubmit={handleUrl}
+          className="space-y-1.5 rounded-md border border-line bg-paper-50 p-2"
+        >
+          <input
+            type="url"
+            required
+            value={url}
+            onChange={(event) => setUrl(event.target.value)}
+            placeholder="https://ejemplo.com/imagen.jpg"
+            aria-label="URL de la imagen"
+            className="w-full rounded border border-line bg-white px-2 py-1.5 text-[11px] text-ink-900 outline-none placeholder:text-ink-400 focus:border-ink-400"
+          />
+          <div className="flex items-center gap-1.5">
+            <label className="flex items-center gap-1 text-[11px] text-ink-600">
+              Página
+              <select
+                value={urlPage}
+                onChange={(event) => setUrlPage(Number(event.target.value))}
+                className="rounded border border-line bg-white px-1 py-1 text-[11px] text-ink-900 outline-none focus:border-ink-400"
+              >
+                {PAGE_NUMBERS.map((page) => (
+                  <option key={page} value={page}>
+                    {page}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="submit"
+              disabled={busy}
+              className="ml-auto rounded-md bg-ink-900 px-2.5 py-1.5 text-[11px] font-medium text-paper-50 transition-colors hover:bg-ink-700 disabled:opacity-60"
+            >
+              {busy ? 'Cargando…' : 'Añadir'}
+            </button>
+          </div>
+          {urlError ? (
+            <p role="alert" className="text-[11px] leading-relaxed text-red-700">
+              {urlError}
+            </p>
+          ) : null}
+        </form>
+      ) : null}
+
+      {activeImage && activePage ? (
+        <div className="space-y-1">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-[11px] font-medium text-ink-600">
+              Tamaño de la imagen
+            </p>
+            <span className="text-[11px] tabular-nums text-ink-600">
+              {scalePercent} %
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <select
+              value={activePage}
+              onChange={(event) => setSizePage(Number(event.target.value))}
+              aria-label="Página de la imagen que quieres ajustar"
+              className="rounded border border-line bg-white px-1 py-1 text-[11px] text-ink-900 outline-none focus:border-ink-400"
+            >
+              {imagePages.map((page) => (
+                <option key={page} value={page}>
+                  P{page}
+                </option>
+              ))}
+            </select>
+            <input
+              type="range"
+              min={PAGE_IMAGE_MIN_SCALE * 100}
+              max={PAGE_IMAGE_MAX_SCALE * 100}
+              step={5}
+              value={scalePercent}
+              onChange={(event) => {
+                const image = pageImages[activePage];
+                if (!image) return;
+                onChange(activePage, {
+                  ...image,
+                  scale: Number(event.target.value) / 100,
+                });
+              }}
+              aria-label={`Tamaño de la imagen de la página ${activePage}`}
+              className="range-input min-w-0 flex-1"
+            />
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function Field({
   label,
   children,
@@ -171,7 +466,7 @@ function Segmented<T extends string>({
   options: Array<{ value: T; label: string }>;
 }) {
   return (
-    <div className="flex rounded-lg border border-line bg-paper-100 p-1">
+    <div className="flex flex-wrap rounded-lg border border-line bg-paper-100 p-1">
       {options.map((option) => {
         const active = option.value === value;
         return (
@@ -180,7 +475,7 @@ function Segmented<T extends string>({
             type="button"
             aria-pressed={active}
             onClick={() => onChange(option.value)}
-            className={`flex-1 rounded-md px-2 py-1.5 text-[11px] font-medium transition-colors ${
+            className={`flex-1 whitespace-nowrap rounded-md px-2 py-1.5 text-[11px] font-medium transition-colors ${
               active
                 ? 'bg-ink-900 text-paper-50'
                 : 'text-ink-600 hover:text-ink-900'

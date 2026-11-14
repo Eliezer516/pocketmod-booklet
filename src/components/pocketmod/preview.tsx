@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
+import type { PageImages } from '../../lib/page-images';
 import {
   PAPERS,
   mmToPx,
@@ -24,6 +25,7 @@ interface PreviewProps {
   busy: boolean;
   error: string | null;
   hasText: boolean;
+  pageImages: PageImages;
 }
 
 const blankPage = (pageNumber: number): PageData => ({
@@ -43,6 +45,7 @@ export function Preview({
   busy,
   error,
   hasText,
+  pageImages,
 }: PreviewProps) {
   const paper = PAPERS[settings.paper];
   const pages =
@@ -150,6 +153,7 @@ export function Preview({
             pages={pages}
             settings={settings}
             fontSizePt={fontSizePt}
+            pageImages={pageImages}
           />
         ) : (
           <SheetView
@@ -157,6 +161,7 @@ export function Preview({
             pages={pages}
             settings={settings}
             fontSizePt={fontSizePt}
+            pageImages={pageImages}
           />
         )}
       </div>
@@ -194,11 +199,13 @@ function PagesView({
   pages,
   settings,
   fontSizePt,
+  pageImages,
 }: {
   paper: PaperSpec;
   pages: PageData[];
   settings: Settings;
   fontSizePt: number;
+  pageImages: PageImages;
 }) {
   const { ref, width } = useElementWidth<HTMLDivElement>();
   const pageWidthPx = mmToPx(panelWidthMm(paper));
@@ -240,6 +247,7 @@ function PagesView({
                   page={page}
                   settings={settings}
                   fontSizePt={fontSizePt}
+                  pageImages={pageImages}
                 />
               </div>
             </div>
@@ -271,11 +279,13 @@ function SheetView({
   pages,
   settings,
   fontSizePt,
+  pageImages,
 }: {
   paper: PaperSpec;
   pages: PageData[];
   settings: Settings;
   fontSizePt: number;
+  pageImages: PageImages;
 }) {
   const { ref, width } = useElementWidth<HTMLDivElement>();
   const sheetWidthPx = mmToPx(paper.widthMm);
@@ -299,6 +309,7 @@ function SheetView({
             paper={paper}
             settings={settings}
             fontSizePt={fontSizePt}
+            pageImages={pageImages}
             showGuides={settings.guides}
           />
         </div>

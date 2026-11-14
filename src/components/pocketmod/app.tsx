@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { PAGES_PER_BOOKLET } from '../../lib/imposition';
+import type { PageImage, PageImages } from '../../lib/page-images';
 import { PAPERS } from '../../lib/paper';
 import {
   countWords,
@@ -28,6 +29,7 @@ const MIN_BOOKLETS = 1;
 export function App() {
   const [text, setText] = useState('');
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
+  const [pageImages, setPageImages] = useState<PageImages>({});
   const [result, setResult] = useState<PaginationResult | null>(null);
   const [mode, setMode] = useState<PreviewMode>('pages');
   const [activeBooklet, setActiveBooklet] = useState(0);
@@ -51,6 +53,7 @@ export function App() {
     if (saved) {
       setText(saved.text);
       setSettings(saved.settings);
+      setPageImages(saved.pageImages);
     }
     setHydrated(true);
   }, []);
@@ -62,7 +65,7 @@ export function App() {
     setBusy(true);
     const timer = window.setTimeout(() => {
       try {
-        const next = paginateText(text, settings);
+        const next = paginateText(text, settings, pageImages);
         setResult(next);
         setError(null);
       } catch (cause) {
@@ -76,7 +79,7 @@ export function App() {
     }, PAGINATION_DELAY_MS);
 
     return () => window.clearTimeout(timer);
-  }, [text, settings, hydrated, fontsReady]);
+  }, [text, settings, pageImages, hydrated, fontsReady]);
 
   // System fonts are available immediately, but waiting for the font set
   // guarantees that a slow custom fallback never changes the line count.
@@ -100,7 +103,7 @@ export function App() {
     if (!hydrated) return;
     if (saveTimer.current !== null) window.clearTimeout(saveTimer.current);
     saveTimer.current = window.setTimeout(() => {
-      saveState({ text, settings });
+      saveState({ text, settings, pageImages });
     }, 400);
     return () => {
       if (saveTimer.current !== null) {
@@ -108,7 +111,7 @@ export function App() {
         saveTimer.current = null;
       }
     };
-  }, [text, settings, hydrated]);
+  }, [text, settings, pageImages, hydrated]);
 
   // Keep the selected booklet in range after the text gets shorter.
   useEffect(() => {
@@ -146,6 +149,18 @@ export function App() {
     setSettings(DEFAULT_SETTINGS);
   }, []);
 
+  const updatePageImage = useCallback(
+    (page: number, image: PageImage | null) => {
+      setPageImages((previous) => {
+        const next: PageImages = { ...previous };
+        if (image) next[page] = image;
+        else delete next[page];
+        return next;
+      });
+    },
+    [],
+  );
+
   const closeFoldGuide = useCallback(() => {
     setFoldGuideOpen(false);
     // Return focus to the control that opened the dialog.
@@ -159,7 +174,7 @@ export function App() {
       // Recalculate synchronously so a print started right after a change
       // never uses a stale imposition. flushSync commits the fresh sheet
       // before the browser opens its print dialog.
-      const fresh = paginateText(text, settings);
+      const fresh = paginateText(text, settings, pageImages);
       flushSync(() => {
         setResult(fresh);
         setError(null);
@@ -171,7 +186,7 @@ export function App() {
     }
 
     window.print();
-  }, [hasText, settings, text]);
+  }, [hasText, pageImages, settings, text]);
 
   return (
     <>
@@ -245,11 +260,14 @@ export function App() {
               characters={text.length}
               onSample={handleSample}
               onClear={handleClear}
+              imageAlign={settings.imageAlign}
             />
 
             <ControlsPanel
               settings={settings}
               onChange={updateSetting}
+              pageImages={pageImages}
+              onPageImageChange={updatePageImage}
               usedFontSizePt={result?.usedFontSizePt ?? settings.fontSizePt}
               shrunk={result?.shrunk ?? false}
               bookletCount={bookletCount}
@@ -267,6 +285,7 @@ export function App() {
             busy={busy}
             error={error}
             hasText={hasText}
+            pageImages={pageImages}
           />
         </main>
 
@@ -283,7 +302,11 @@ export function App() {
         </footer>
       </div>
 
-      <PrintRoot result={result} settings={settings} />
+      <PrintRoot
+        result={result}
+        settings={settings}
+        pageImages={pageImages}
+      />
 
       {foldGuideOpen ? <FoldGuide onClose={closeFoldGuide} /> : null}
     </>

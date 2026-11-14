@@ -1,4 +1,5 @@
 import { SHEET_SLOTS } from '../../lib/imposition';
+import type { PageImages } from '../../lib/page-images';
 import {
   type PaperSpec,
   panelHeightMm,
@@ -13,6 +14,7 @@ interface SheetProps {
   paper: PaperSpec;
   settings: Settings;
   fontSizePt: number;
+  pageImages: PageImages;
   showGuides?: boolean;
 }
 
@@ -21,6 +23,7 @@ export function Sheet({
   paper,
   settings,
   fontSizePt,
+  pageImages,
   showGuides = false,
 }: SheetProps) {
   const panelW = panelWidthMm(paper);
@@ -52,7 +55,12 @@ export function Sheet({
               transform: slot.rotated ? 'rotate(180deg)' : undefined,
             }}
           >
-            <PageCard page={page} settings={settings} fontSizePt={fontSizePt} />
+            <PageCard
+              page={page}
+              settings={settings}
+              fontSizePt={fontSizePt}
+              pageImages={pageImages}
+            />
           </div>
         );
       })}

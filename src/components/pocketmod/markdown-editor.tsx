@@ -6,17 +6,44 @@ import type {
   Theme,
   ToolbarButton,
 } from 'overtype';
+import { encodeImageFile, IMAGE_MIME_TYPES } from '../../lib/images';
+import type { ImageAlign } from '../../lib/settings';
 
 interface MarkdownEditorProps {
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  imageAlign?: ImageAlign;
 }
 
 const PLACEHOLDER = 'Escribe o pega tu texto en Markdown…';
 
 const READING_FONT =
   "'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif";
+
+/**
+ * OverType's parser rejects data: URLs, so uploaded images render as text in
+ * the editor preview. This post-processor turns those constructs back into
+ * real <img> tags so the user can see the image while editing, whether the
+ * image sits on its own line or inside a paragraph.
+ */
+function renderUploadedImages(html: string): string {
+  const uploadedImage =
+    /!<a\s+href="#"[^>]*>\s*<span class="syntax-marker">\s*\[\s*<\/span>([^<]*)<span class="syntax-marker url-part">\s*\]\s*\((data:image\/[^)\s]+)\)\s*<\/span>\s*<\/a>/g;
+  return html.replace(uploadedImage, (_match, alt: string, url: string) => {
+    const safeAlt = alt.trim();
+    return `<img src="${url}" alt="${safeAlt}">`;
+  });
+}
+
+/** Alt text cannot contain brackets or newlines without breaking the link. */
+function imageAltFromFilename(name: string): string {
+  return name
+    .replace(/\.[a-z0-9]+$/i, '')
+    .replace(/[[\]\n\r]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
 /**
  * Neutral palette for the editor chrome. The document text keeps the serif
@@ -72,6 +99,8 @@ function buildToolbar(
     { ...buttons.bulletList, title: 'Lista con viñetas (Ctrl+Shift+8)' },
     { ...buttons.orderedList, title: 'Lista numerada (Ctrl+Shift+7)' },
     { ...buttons.quote, title: 'Cita (Ctrl+Shift+.)' },
+    buttons.separator,
+    { ...buttons.upload, title: 'Insertar imagen' },
   ];
 }
 
@@ -79,6 +108,7 @@ export function MarkdownEditor({
   value,
   onChange,
   className,
+  imageAlign,
 }: MarkdownEditorProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<OverTypeInstance | null>(null);
@@ -114,6 +144,28 @@ export function MarkdownEditor({
           spellcheck: true,
           toolbar: true,
           toolbarButtons: buildToolbar(toolbarButtons),
+          customSyntax: renderUploadedImages,
+          fileUpload: {
+            enabled: true,
+            mimeTypes: IMAGE_MIME_TYPES,
+            maxSize: 12 * 1024 * 1024,
+            batch: false,
+            onInsertFile: async (file) => {
+              const target = Array.isArray(file) ? file[0] : file;
+              if (!target) return '';
+              try {
+                const encoded = await encodeImageFile(target);
+                const alt = imageAltFromFilename(target.name) || 'Imagen';
+                return `![${alt}](${encoded.src})`;
+              } catch (error) {
+                console.error('Error al procesar la imagen', error);
+                window.alert(
+                  'No se pudo insertar la imagen. Comprueba que el archivo sea válido y que haya espacio libre en el disco.',
+                );
+                return '';
+              }
+            },
+          },
           mobile: {
             fontSize: '16px',
             lineHeight: 1.6,
@@ -165,5 +217,11 @@ export function MarkdownEditor({
     );
   }
 
-  return <div ref={hostRef} className={className} />;
+  return (
+    <div
+      ref={hostRef}
+      className={className}
+      data-image-align={imageAlign ?? 'center'}
+    />
+  );
 }

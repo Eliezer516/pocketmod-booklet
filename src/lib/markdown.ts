@@ -7,6 +7,16 @@ const md = new MarkdownIt({
   breaks: true,
 });
 
+// Allow data:image/... URLs (uploaded images) while keeping other protocols
+// restricted to the defaults (http, https, ftp, mailto).
+md.validateLink = (url: string) => {
+  const normalized = url.trim().toLowerCase();
+  if (normalized.startsWith('data:image/')) return true;
+  const protocolMatch = /^([a-z][a-z0-9+.-]*):/i.exec(normalized);
+  if (!protocolMatch) return true;
+  return /^(https?|ftp|mailto):$/i.test(protocolMatch[1] ?? '');
+};
+
 const renderToken = md.renderer.rules.link_open;
 md.renderer.rules.link_open = (tokens, idx, options, env, renderer) => {
   const token = tokens[idx];
@@ -16,6 +26,21 @@ md.renderer.rules.link_open = (tokens, idx, options, env, renderer) => {
   }
   return renderToken
     ? renderToken(tokens, idx, options, env, renderer)
+    : renderer.renderToken(tokens, idx, options);
+};
+
+// Images are embedded as data URLs. Decoding them synchronously lets the
+// paginator measure their real height on the first pass instead of cutting
+// text over an image that has not been decoded yet.
+const renderImage = md.renderer.rules.image;
+md.renderer.rules.image = (tokens, idx, options, env, renderer) => {
+  const token = tokens[idx];
+  if (token) {
+    token.attrSet('decoding', 'sync');
+    token.attrSet('loading', 'eager');
+  }
+  return renderImage
+    ? renderImage(tokens, idx, options, env, renderer)
     : renderer.renderToken(tokens, idx, options);
 };
 

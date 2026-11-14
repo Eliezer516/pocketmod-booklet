@@ -1,3 +1,4 @@
+import type { ImageAlign } from '../../lib/settings';
 import { MarkdownEditor } from './markdown-editor';
 import { SparkIcon, TrashIcon } from './icons';
 
@@ -8,6 +9,7 @@ interface EditorPanelProps {
   characters: number;
   onSample: () => void;
   onClear: () => void;
+  imageAlign: ImageAlign;
 }
 
 export function EditorPanel({
@@ -17,6 +19,7 @@ export function EditorPanel({
   characters,
   onSample,
   onClear,
+  imageAlign,
 }: EditorPanelProps) {
   return (
     <section>
@@ -54,6 +57,7 @@ export function EditorPanel({
       <MarkdownEditor
         value={text}
         onChange={onChange}
+        imageAlign={imageAlign}
         className="h-[320px] w-full bg-paper-50 sm:h-[340px] lg:h-[380px]"
       />
 

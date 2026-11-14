@@ -1,6 +1,7 @@
 import type { PaperId } from './paper';
 
 export type FontId = 'serif' | 'sans' | 'mono';
+export type ImageAlign = 'left' | 'center' | 'right' | 'top' | 'bottom';
 
 export interface Settings {
   paper: PaperId;
@@ -11,6 +12,7 @@ export interface Settings {
   justify: boolean;
   pageNumbers: boolean;
   guides: boolean;
+  imageAlign: ImageAlign;
 }
 
 export const FONT_STACKS: Record<FontId, string> = {
@@ -28,6 +30,14 @@ export const FONT_LABELS: Record<FontId, string> = {
   mono: 'Mono',
 };
 
+export const IMAGE_ALIGN_LABELS: Record<ImageAlign, string> = {
+  left: 'Izquierda',
+  center: 'Centro',
+  right: 'Derecha',
+  top: 'Arriba',
+  bottom: 'Abajo',
+};
+
 export const MIN_FONT_PT = 7;
 export const MAX_FONT_PT = 14;
 export const MIN_AUTO_FONT_PT = 6;
@@ -42,6 +52,7 @@ export const DEFAULT_SETTINGS: Settings = {
   justify: true,
   pageNumbers: true,
   guides: false,
+  imageAlign: 'center',
 };
 
 const clamp = (value: number, min: number, max: number, fallback: number) => {
@@ -81,5 +92,15 @@ export function sanitizeSettings(input: unknown): Settings {
     pageNumbers:
       typeof raw.pageNumbers === 'boolean' ? raw.pageNumbers : true,
     guides: raw.guides === true,
+    imageAlign: isImageAlign(raw.imageAlign)
+      ? raw.imageAlign
+      : DEFAULT_SETTINGS.imageAlign,
   };
+}
+
+function isImageAlign(value: unknown): value is ImageAlign {
+  return (
+    typeof value === 'string' &&
+    ['left', 'center', 'right', 'top', 'bottom'].includes(value)
+  );
 }

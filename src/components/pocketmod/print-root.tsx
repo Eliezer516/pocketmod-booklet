@@ -1,3 +1,4 @@
+import type { PageImages } from '../../lib/page-images';
 import { PAPERS } from '../../lib/paper';
 import type { PaginationResult } from '../../lib/pagination';
 import type { Settings } from '../../lib/settings';
@@ -6,9 +7,10 @@ import { Sheet } from './sheet';
 interface PrintRootProps {
   result: PaginationResult | null;
   settings: Settings;
+  pageImages: PageImages;
 }
 
-export function PrintRoot({ result, settings }: PrintRootProps) {
+export function PrintRoot({ result, settings, pageImages }: PrintRootProps) {
   if (!result) return null;
   const paper = PAPERS[settings.paper];
 
@@ -28,6 +30,7 @@ export function PrintRoot({ result, settings }: PrintRootProps) {
             paper={paper}
             settings={settings}
             fontSizePt={result.usedFontSizePt}
+            pageImages={pageImages}
             showGuides={settings.guides}
           />
         </div>
