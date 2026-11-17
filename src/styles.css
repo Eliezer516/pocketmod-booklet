@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @theme {
   --color-paper-50: #ffffff;
@@ -17,14 +17,14 @@
   --color-accent-700: #8d3822;
 
   --font-display:
-    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, sans-serif;
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
   --font-reading:
-    'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia,
+    "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia,
     serif;
   --font-mono:
-    ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Consolas,
-    'Liberation Mono', monospace;
+    ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas,
+    "Liberation Mono", monospace;
 }
 
 @layer base {
@@ -328,18 +328,18 @@
     object-fit: contain;
   }
 
-  .pocket-markdown[data-image-align='left'] img,
-  [data-image-align='left'] .overtype-wrapper .overtype-preview img {
+  .pocket-markdown[data-image-align="left"] img,
+  [data-image-align="left"] .overtype-wrapper .overtype-preview img {
     margin: 0 auto 0 0;
   }
 
-  .pocket-markdown[data-image-align='center'] img,
-  [data-image-align='center'] .overtype-wrapper .overtype-preview img {
+  .pocket-markdown[data-image-align="center"] img,
+  [data-image-align="center"] .overtype-wrapper .overtype-preview img {
     margin: 0 auto;
   }
 
-  .pocket-markdown[data-image-align='right'] img,
-  [data-image-align='right'] .overtype-wrapper .overtype-preview img {
+  .pocket-markdown[data-image-align="right"] img,
+  [data-image-align="right"] .overtype-wrapper .overtype-preview img {
     margin: 0 0 0 auto;
   }
 
@@ -347,15 +347,15 @@
    * Top and bottom align the image with the first or last text line of its
    * paragraph, so it sits on the same line as the text instead of centred.
    */
-  .pocket-markdown[data-image-align='top'] img,
-  [data-image-align='top'] .overtype-wrapper .overtype-preview img {
+  .pocket-markdown[data-image-align="top"] img,
+  [data-image-align="top"] .overtype-wrapper .overtype-preview img {
     display: inline-block;
     vertical-align: top;
     margin: 0 0.35em 0 0;
   }
 
-  .pocket-markdown[data-image-align='bottom'] img,
-  [data-image-align='bottom'] .overtype-wrapper .overtype-preview img {
+  .pocket-markdown[data-image-align="bottom"] img,
+  [data-image-align="bottom"] .overtype-wrapper .overtype-preview img {
     display: inline-block;
     vertical-align: bottom;
     margin: 0 0.35em 0 0;
@@ -370,7 +370,7 @@
  * with a thin stroke (OverType's documented workaround). Preview mode keeps
  * real bold and italic.
  */
-.overtype-container:not([data-mode='preview'])
+.overtype-container:not([data-mode="preview"])
   .overtype-wrapper
   .overtype-preview
   :is(h1, h2, h3, strong, .header) {
@@ -378,7 +378,7 @@
   -webkit-text-stroke: 0.55px currentColor;
 }
 
-.overtype-container:not([data-mode='preview'])
+.overtype-container:not([data-mode="preview"])
   .overtype-wrapper
   .overtype-preview
   :is(em, .blockquote) {

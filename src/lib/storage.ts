@@ -42,7 +42,7 @@ export function saveState(state: SavedState): void {
   } catch (error) {
     if (
       error instanceof DOMException &&
-      (      error.name === 'QuotaExceededError' ||
+      (error.name === 'QuotaExceededError' ||
         error.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
       !quotaWarned
     ) {

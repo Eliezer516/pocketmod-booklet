@@ -44,6 +44,8 @@ export function App() {
   const paper = PAPERS[settings.paper];
   const words = useMemo(() => countWords(text), [text]);
   const hasText = text.trim().length > 0;
+  const hasImages = Object.keys(pageImages).length > 0;
+  const canPrint = hasText || hasImages;
   const bookletCount = result?.booklets.length ?? MIN_BOOKLETS;
 
   // Restore the previous session. This happens after mount so the static HTML
@@ -168,7 +170,7 @@ export function App() {
   }, []);
 
   const handlePrint = useCallback(() => {
-    if (!hasText) return;
+    if (!canPrint) return;
 
     try {
       // Recalculate synchronously so a print started right after a change
@@ -186,7 +188,7 @@ export function App() {
     }
 
     window.print();
-  }, [hasText, pageImages, settings, text]);
+  }, [canPrint, pageImages, settings, text]);
 
   return (
     <>
@@ -223,6 +225,8 @@ export function App() {
                       {bookletCount === 1 ? 'cuadernillo' : 'cuadernillos'}
                     </span>
                   </>
+                ) : hasImages ? (
+                  <span>Solo imágenes</span>
                 ) : (
                   <span>Sin texto</span>
                 )}
@@ -241,7 +245,7 @@ export function App() {
               <button
                 type="button"
                 onClick={handlePrint}
-                disabled={!hasText}
+                disabled={!canPrint}
                 className="inline-flex h-9 items-center gap-2 rounded-lg bg-ink-900 px-3.5 text-[12px] font-medium text-paper-50 transition-colors hover:bg-ink-800 disabled:cursor-not-allowed disabled:bg-paper-200 disabled:text-ink-600 disabled:hover:bg-paper-200"
               >
                 <PrinterIcon className="h-4 w-4" />
@@ -286,6 +290,7 @@ export function App() {
             error={error}
             hasText={hasText}
             pageImages={pageImages}
+            onPageImageChange={updatePageImage}
           />
         </main>
 

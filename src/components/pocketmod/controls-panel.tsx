@@ -1,23 +1,11 @@
 import {
   useId,
-  useRef,
   useState,
-  type ChangeEvent,
   type FormEvent,
   type ReactNode,
 } from 'react';
-import {
-  encodeImageFile,
-  IMAGE_MIME_TYPES,
-  loadImageFromUrl,
-} from '../../lib/images';
-import {
-  PAGE_IMAGE_MAX_SCALE,
-  PAGE_IMAGE_MIN_SCALE,
-  pageImageScale,
-  type PageImage,
-  type PageImages,
-} from '../../lib/page-images';
+import { loadImageFromUrl } from '../../lib/images';
+import type { PageImage, PageImages } from '../../lib/page-images';
 import { PAPERS, type PaperId } from '../../lib/paper';
 import {
   DEFAULT_SETTINGS,
@@ -106,14 +94,11 @@ export function ControlsPanel({
         </Field>
 
         <Field label="Imágenes por página">
-          <PageImageGrid
-            pageImages={pageImages}
-            onChange={onPageImageChange}
-          />
+          <PageImageUrl pageImages={pageImages} onChange={onPageImageChange} />
           <p className="text-[11px] leading-relaxed text-ink-500">
-            Una imagen por cada página del cuadernillo. La alineación de arriba
-            decide dónde se coloca y el texto usa el espacio restante. El
-            deslizador ajusta el tamaño de cada imagen.
+            Usa el botón + bajo cada página del cuadernillo para añadir o cambiar
+            su imagen. Ocupa toda la página y la alineación decide cómo se encaja
+            cuando su proporción no coincide con la de la hoja.
           </p>
         </Field>
 
@@ -199,26 +184,18 @@ export function ControlsPanel({
 
 const PAGE_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 
-function PageImageGrid({
+function PageImageUrl({
   pageImages,
   onChange,
 }: {
   pageImages: PageImages;
   onChange: (page: number, image: PageImage | null) => void;
 }) {
-  const inputs = useRef<Array<HTMLInputElement | null>>([]);
   const [urlOpen, setUrlOpen] = useState(false);
   const [url, setUrl] = useState('');
   const [urlPage, setUrlPage] = useState(1);
   const [busy, setBusy] = useState(false);
   const [urlError, setUrlError] = useState<string | null>(null);
-  const [sizePage, setSizePage] = useState(1);
-  const imagePages = PAGE_NUMBERS.filter((page) => pageImages[page]);
-  const activePage = pageImages[sizePage] ? sizePage : imagePages[0];
-  const activeImage = activePage ? pageImages[activePage] : undefined;
-  const scalePercent = activeImage
-    ? Math.round(pageImageScale(activeImage) * 100)
-    : 100;
 
   const toggleUrl = () => {
     if (urlOpen) {
@@ -254,92 +231,8 @@ function PageImageGrid({
     }
   };
 
-  const handleFile = async (
-    event: ChangeEvent<HTMLInputElement>,
-    page: number,
-  ) => {
-    const input = event.currentTarget;
-    const file = input.files?.[0];
-    // Reset the input so choosing the same file again fires a change event.
-    input.value = '';
-    if (!file) return;
-
-    try {
-      const encoded = await encodeImageFile(file);
-      onChange(page, encoded);
-    } catch (error) {
-      console.error('Error al procesar la imagen', error);
-      window.alert(
-        'No se pudo cargar la imagen. Comprueba que el archivo sea una imagen válida.',
-      );
-    }
-  };
-
   return (
     <div className="space-y-1.5">
-      <div className="grid grid-cols-4 gap-1.5">
-        {PAGE_NUMBERS.map((page) => {
-          const image = pageImages[page];
-          return (
-            <div key={page} className="relative">
-              <button
-                type="button"
-                onClick={() => inputs.current[page]?.click()}
-                aria-label={
-                  image
-                    ? `Cambiar imagen de la página ${page}`
-                    : `Añadir imagen a la página ${page}`
-                }
-                className="flex h-14 w-full flex-col items-center justify-center overflow-hidden rounded-md border border-line bg-paper-50 p-1 text-ink-500 transition-colors hover:border-ink-400 hover:text-ink-900"
-              >
-                {image ? (
-                  <img
-                    src={image.src}
-                    alt=""
-                    className="max-h-9 max-w-full object-contain"
-                  />
-                ) : (
-                  <span
-                    aria-hidden="true"
-                    className="text-[17px] font-light leading-none"
-                  >
-                    +
-                  </span>
-                )}
-                <span className="mt-0.5 text-[9px] font-medium leading-none tabular-nums">
-                  P{page}
-                </span>
-              </button>
-
-              {image ? (
-                <button
-                  type="button"
-                  onClick={() => onChange(page, null)}
-                  aria-label={`Quitar imagen de la página ${page}`}
-                  className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full border border-line bg-paper-50 text-[11px] leading-none text-ink-600 shadow-sm transition-colors hover:text-red-700"
-                >
-                  ×
-                </button>
-              ) : null}
-
-              <input
-                ref={(node) => {
-                  inputs.current[page] = node;
-                }}
-                type="file"
-                accept={IMAGE_MIME_TYPES.join(',')}
-                className="sr-only"
-                tabIndex={-1}
-                aria-hidden="true"
-                onChange={(event) => {
-                  void handleFile(event, page);
-                }}
-              />
-            </div>
-          );
-        })}
-      </div>
-
       <button
         type="button"
         onClick={toggleUrl}
@@ -392,50 +285,6 @@ function PageImageGrid({
             </p>
           ) : null}
         </form>
-      ) : null}
-
-      {activeImage && activePage ? (
-        <div className="space-y-1">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-[11px] font-medium text-ink-600">
-              Tamaño de la imagen
-            </p>
-            <span className="text-[11px] tabular-nums text-ink-600">
-              {scalePercent} %
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <select
-              value={activePage}
-              onChange={(event) => setSizePage(Number(event.target.value))}
-              aria-label="Página de la imagen que quieres ajustar"
-              className="rounded border border-line bg-white px-1 py-1 text-[11px] text-ink-900 outline-none focus:border-ink-400"
-            >
-              {imagePages.map((page) => (
-                <option key={page} value={page}>
-                  P{page}
-                </option>
-              ))}
-            </select>
-            <input
-              type="range"
-              min={PAGE_IMAGE_MIN_SCALE * 100}
-              max={PAGE_IMAGE_MAX_SCALE * 100}
-              step={5}
-              value={scalePercent}
-              onChange={(event) => {
-                const image = pageImages[activePage];
-                if (!image) return;
-                onChange(activePage, {
-                  ...image,
-                  scale: Number(event.target.value) / 100,
-                });
-              }}
-              aria-label={`Tamaño de la imagen de la página ${activePage}`}
-              className="range-input min-w-0 flex-1"
-            />
-          </div>
-        </div>
       ) : null}
     </div>
   );

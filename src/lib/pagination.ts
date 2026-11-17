@@ -1,6 +1,6 @@
 import { PAGES_PER_BOOKLET } from './imposition';
 import { markdownWordCount, renderMarkdown } from './markdown';
-import { pageImageReserves, pageMetrics, type PageImages } from './page-images';
+import { pageMetrics, type PageImages } from './page-images';
 import { PT_TO_PX } from './paper';
 import { FONT_STACKS, MIN_AUTO_FONT_PT, type Settings } from './settings';
 
@@ -365,7 +365,7 @@ function paginateBlocks(
   settings: Settings,
   fontSizePt: number,
   maxPages: number,
-  imageReserves: readonly number[],
+  imagePages: ReadonlySet<number>,
 ): PaginatedPages {
   const { widthPx: contentWidthPx, heightPx: contentHeightPx } =
     pageMetrics(settings);
@@ -378,12 +378,15 @@ function paginateBlocks(
   const pages: MeasuredPage[] = [];
 
   try {
+    // Image pages are reserved for their image: text moves on to the next
+    // page instead of being printed over the picture.
     while (pending.length > 0 && pages.length < maxPages) {
-      // A page image reserves part of the printable area before text is laid
-      // out, so the paginator must measure against the remaining height.
-      const reserved =
-        imageReserves[pages.length % PAGES_PER_BOOKLET] ?? 0;
-      const pageHeightPx = Math.max(24, contentHeightPx - reserved);
+      if (imagePages.has((pages.length % PAGES_PER_BOOKLET) + 1)) {
+        pages.push({ html: '', fill: 0 });
+        continue;
+      }
+
+      const pageHeightPx = contentHeightPx;
 
       const page = createPage(
         host,
@@ -473,6 +476,18 @@ export function paginateText(
   const source = normalizeMarkdown(raw);
   if (!source) return blankResult(settings);
 
+  const imagePages = new Set(
+    Object.keys(pageImages)
+      .map((key) => Number.parseInt(key, 10))
+      .filter(
+        (page) =>
+          Number.isInteger(page) && page >= 1 && page <= PAGES_PER_BOOKLET,
+      ),
+  );
+  // With every page taken by an image there is nowhere to put the text. In
+  // that case keep the text and let it share the page with the image.
+  if (imagePages.size >= PAGES_PER_BOOKLET) imagePages.clear();
+
   const template = document.createElement('template');
   template.innerHTML = renderMarkdown(source);
   const blocks = Array.from(template.content.children);
@@ -487,7 +502,6 @@ export function paginateText(
     candidates.push(MIN_AUTO_FONT_PT);
   }
 
-  const imageReserves = pageImageReserves(settings, pageImages);
   let usedPt = candidates[0] ?? basePt;
   let chosen: PaginatedPages | null = null;
 
@@ -497,7 +511,7 @@ export function paginateText(
       settings,
       pt,
       PAGES_PER_BOOKLET,
-      imageReserves,
+      imagePages,
     );
     if (!attempt.overflow) {
       chosen = attempt;
@@ -508,20 +522,16 @@ export function paginateText(
 
   if (!chosen) {
     usedPt = MIN_AUTO_FONT_PT;
-    chosen = paginateBlocks(
-      blocks,
-      settings,
-      usedPt,
-      MAX_PAGES,
-      imageReserves,
-    );
+    chosen = paginateBlocks(blocks, settings, usedPt, MAX_PAGES, imagePages);
   }
 
   const pages = chosen.pages;
-  const totalTextPages = Math.max(1, pages.length);
+  const totalTextPages = pages.filter(
+    (page) => page.html.trim().length > 0,
+  ).length;
   const bookletCount = Math.max(
     1,
-    Math.ceil(totalTextPages / PAGES_PER_BOOKLET),
+    Math.ceil(pages.length / PAGES_PER_BOOKLET),
   );
 
   const booklets: PageData[][] = [];

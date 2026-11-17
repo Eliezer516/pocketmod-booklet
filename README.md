@@ -74,25 +74,27 @@ Hay dos formas de añadir imágenes:
   ![Playa al atardecer](data:image/jpeg;base64,…)
   ~~~
 
-- **Una imagen por página**: en **Formato › Imágenes por página** hay ocho
-  ranuras, una por cada página del cuadernillo. Cada ranura acepta un archivo o
-  una URL. Al asignar una imagen, el paginador reserva su espacio y reparte el
-  texto en el área que queda libre.
+- **Una imagen por página**: en la vista **Cuadernillo**, cada página tiene un
+  botón **+** justo debajo. Al pulsarlo se elige un archivo; si la página ya
+  tiene imagen, el botón muestra una miniatura con **Cambiar** y una **×** para
+  quitarla. La imagen ocupa toda el área imprimible de la página y el texto se
+  reparte por las páginas que quedan libres.
 
-Bajo la rejilla, **Añadir desde una URL** permite pegar la dirección de una
-imagen y elegir la página. Si el servidor permite leerla entre dominios, se
-descarga y se guarda incrustada como las subidas; si no, se guarda la dirección
-y la imagen se carga desde la red. En el texto también puedes insertar una
-imagen remota escribiendo `![pie de foto](https://…)`.
+En **Formato › Imágenes por página › Añadir desde una URL** puedes pegar la
+dirección de una imagen y elegir la página. Si el servidor permite leerla entre
+dominios, se descarga y se guarda incrustada como las subidas; si no, se guarda
+la dirección y la imagen se carga desde la red. En el texto también puedes
+insertar una imagen remota escribiendo `![pie de foto](https://…)`.
 
 En **Formato › Alineación de imágenes** eliges izquierda, centro o derecha, o
-arriba y abajo. En las imágenes de página, arriba/abajo anclan la imagen al
-borde superior o inferior del área imprimible; las demás opciones la colocan
-arriba con el alineado horizontal elegido.
+arriba y abajo. En las imágenes de página, la alineación decide en qué borde del
+área imprimible se apoya la imagen (o si queda centrada) cuando su proporción no
+coincide con la de la página: las imágenes nunca se deforman ni se recortan.
 
-Cada imagen de página tiene además su propio **tamaño** (25–100 %), con un
-deslizador que aparece bajo la rejilla cuando hay imágenes. Al reducirlo, la
-imagen ocupa menos y el paginador devuelve ese espacio al texto.
+La imagen de página se dibuja a tamaño completo dentro del área imprimible y
+reserva esa página para ella: el texto continúa en la siguiente página libre. Si
+las ocho páginas tienen imagen, el texto se mantiene y se dibuja encima sobre un
+fondo blanco translúcido para que siga siendo legible.
 
 Antes de insertarlas, las imágenes rasterizadas se reducen a 600 px de lado
 mayor y se guardan como JPEG, para que el documento quepa en `localStorage`.
