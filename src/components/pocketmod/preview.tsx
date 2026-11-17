@@ -1,5 +1,9 @@
-import { useRef, type CSSProperties, type ReactNode } from "react";
-import { encodeImageFile, IMAGE_MIME_TYPES } from "../../lib/images";
+import {
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import type { PageImage, PageImages } from "../../lib/page-images";
 import {
   PAPERS,
@@ -11,6 +15,7 @@ import {
 import type { PageData, PaginationResult } from "../../lib/pagination";
 import type { Settings } from "../../lib/settings";
 import { PageCard } from "./page-card";
+import { PageImageDialog } from "./page-image-dialog";
 import { Sheet } from "./sheet";
 import { useElementWidth } from "./use-element-width";
 
@@ -299,79 +304,69 @@ function PageImageSlot({
   image: PageImage | undefined;
   onChange: (page: number, image: PageImage | null) => void;
 }) {
-  const input = useRef<HTMLInputElement | null>(null);
+  const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
 
-  const handleFile = async (file: File | undefined) => {
-    if (!file) return;
+  const close = () => {
+    setOpen(false);
+    // Give focus back to the bar that opened the dialog.
+    window.requestAnimationFrame(() => triggerRef.current?.focus());
+  };
 
-    try {
-      const encoded = await encodeImageFile(file);
-      onChange(page, encoded);
-    } catch (cause) {
-      console.error("Error al procesar la imagen", cause);
-      window.alert(
-        "No se pudo cargar la imagen. Comprueba que el archivo sea una imagen válida.",
-      );
-    }
+  const save = (next: PageImage) => {
+    onChange(page, next);
+    close();
   };
 
   return (
-    <div className="mt-2.5 flex items-stretch overflow-hidden rounded-md border border-line bg-paper-50">
-      <button
-        type="button"
-        onClick={() => input.current?.click()}
-        aria-label={
-          image
-            ? `Cambiar imagen de la página ${page}`
-            : `Añadir imagen a la página ${page}`
-        }
-        className="flex min-w-0 flex-1 items-center justify-center gap-2 px-2 py-1.5 text-ink-500 transition-colors hover:bg-paper-100 hover:text-ink-900"
-      >
-        {image ? (
-          <>
-            <img
-              src={image.src}
-              alt=""
-              className="h-5 w-8 shrink-0 rounded-[2px] object-contain"
-            />
-            <span className="text-[11px] font-medium">Cambiar</span>
-          </>
-        ) : (
-          <span
-            aria-hidden="true"
-            className="text-[16px] font-light leading-none"
-          >
-            +
-          </span>
-        )}
-      </button>
-
-      {image ? (
+    <>
+      <div className="mt-2.5 flex items-stretch overflow-hidden rounded-md border border-line bg-paper-50">
         <button
+          ref={triggerRef}
           type="button"
-          onClick={() => onChange(page, null)}
-          aria-label={`Quitar imagen de la página ${page}`}
-          className="flex items-center border-l border-line px-2.5 text-[14px] leading-none text-ink-500 transition-colors hover:bg-paper-100 hover:text-red-700"
+          onClick={() => setOpen(true)}
+          aria-label={
+            image
+              ? `Cambiar imagen de la página ${page}`
+              : `Añadir imagen a la página ${page}`
+          }
+          className="flex min-w-0 flex-1 items-center justify-center gap-2 px-2 py-1.5 text-ink-500 transition-colors hover:bg-paper-100 hover:text-ink-900"
         >
-          ×
+          {image ? (
+            <>
+              <img
+                src={image.src}
+                alt=""
+                className="h-5 w-8 shrink-0 rounded-[2px] object-contain"
+              />
+              <span className="text-[11px] font-medium">Cambiar</span>
+            </>
+          ) : (
+            <span
+              aria-hidden="true"
+              className="text-[16px] font-light leading-none"
+            >
+              +
+            </span>
+          )}
         </button>
-      ) : null}
 
-      <input
-        ref={input}
-        type="file"
-        accept={IMAGE_MIME_TYPES.join(",")}
-        className="sr-only"
-        tabIndex={-1}
-        aria-hidden="true"
-        onChange={(event) => {
-          const file = event.currentTarget.files?.[0];
-          // Reset the input so choosing the same file again fires a change.
-          event.currentTarget.value = "";
-          void handleFile(file);
-        }}
-      />
-    </div>
+        {image ? (
+          <button
+            type="button"
+            onClick={() => onChange(page, null)}
+            aria-label={`Quitar imagen de la página ${page}`}
+            className="flex items-center border-l border-line px-2.5 text-[14px] leading-none text-ink-500 transition-colors hover:bg-paper-100 hover:text-red-700"
+          >
+            ×
+          </button>
+        ) : null}
+      </div>
+
+      {open ? (
+        <PageImageDialog page={page} onSave={save} onClose={close} />
+      ) : null}
+    </>
   );
 }
 

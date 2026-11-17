@@ -101,3 +101,21 @@ export function ArrowIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function UploadIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...base} {...props}>
+      <path d="M12 15.5V4.5M7.5 9 12 4.5 16.5 9" />
+      <path d="M4.5 15v3.5a1.5 1.5 0 0 0 1.5 1.5h12a1.5 1.5 0 0 0 1.5-1.5V15" />
+    </svg>
+  );
+}
+
+export function LinkIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" {...base} {...props}>
+      <path d="M10.4 13.6a3.7 3.7 0 0 0 5.2 0l2.6-2.6a3.7 3.7 0 0 0-5.2-5.2L11.6 7" />
+      <path d="M13.6 10.4a3.7 3.7 0 0 0-5.2 0l-2.6 2.6a3.7 3.7 0 0 0 5.2 5.2l1.4-1.4" />
+    </svg>
+  );
+}

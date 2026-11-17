@@ -1,11 +1,4 @@
-import {
-  useId,
-  useState,
-  type FormEvent,
-  type ReactNode,
-} from 'react';
-import { loadImageFromUrl } from '../../lib/images';
-import type { PageImage, PageImages } from '../../lib/page-images';
+import { useId, type ReactNode } from 'react';
 import { PAPERS, type PaperId } from '../../lib/paper';
 import {
   DEFAULT_SETTINGS,
@@ -22,8 +15,6 @@ import { ChevronIcon } from './icons';
 interface ControlsPanelProps {
   settings: Settings;
   onChange: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
-  pageImages: PageImages;
-  onPageImageChange: (page: number, image: PageImage | null) => void;
   usedFontSizePt: number;
   shrunk: boolean;
   bookletCount: number;
@@ -33,8 +24,6 @@ interface ControlsPanelProps {
 export function ControlsPanel({
   settings,
   onChange,
-  pageImages,
-  onPageImageChange,
   usedFontSizePt,
   shrunk,
   bookletCount,
@@ -91,14 +80,11 @@ export function ControlsPanel({
               { value: 'bottom', label: IMAGE_ALIGN_LABELS.bottom },
             ]}
           />
-        </Field>
-
-        <Field label="Imágenes por página">
-          <PageImageUrl pageImages={pageImages} onChange={onPageImageChange} />
           <p className="text-[11px] leading-relaxed text-ink-500">
-            Usa el botón + bajo cada página del cuadernillo para añadir o cambiar
-            su imagen. Ocupa toda la página y la alineación decide cómo se encaja
-            cuando su proporción no coincide con la de la hoja.
+            Añade una imagen con el botón + bajo cada página del cuadernillo,
+            desde un archivo o una URL. La imagen ocupa toda la página y la
+            alineación decide cómo se encaja cuando su proporción no coincide
+            con la de la hoja.
           </p>
         </Field>
 
@@ -179,114 +165,6 @@ export function ControlsPanel({
         </details>
       </div>
     </section>
-  );
-}
-
-const PAGE_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
-
-function PageImageUrl({
-  pageImages,
-  onChange,
-}: {
-  pageImages: PageImages;
-  onChange: (page: number, image: PageImage | null) => void;
-}) {
-  const [urlOpen, setUrlOpen] = useState(false);
-  const [url, setUrl] = useState('');
-  const [urlPage, setUrlPage] = useState(1);
-  const [busy, setBusy] = useState(false);
-  const [urlError, setUrlError] = useState<string | null>(null);
-
-  const toggleUrl = () => {
-    if (urlOpen) {
-      setUrlOpen(false);
-      return;
-    }
-    const firstEmpty = PAGE_NUMBERS.find((page) => !pageImages[page]);
-    setUrlPage(firstEmpty ?? 1);
-    setUrlError(null);
-    setUrlOpen(true);
-  };
-
-  const handleUrl = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const value = url.trim();
-    if (!value || busy) return;
-
-    setBusy(true);
-    setUrlError(null);
-    try {
-      const imported = await loadImageFromUrl(value);
-      onChange(urlPage, imported);
-      setUrl('');
-      setUrlOpen(false);
-    } catch (error) {
-      setUrlError(
-        error instanceof Error
-          ? error.message
-          : 'No se pudo cargar la imagen desde esa URL.',
-      );
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <div className="space-y-1.5">
-      <button
-        type="button"
-        onClick={toggleUrl}
-        aria-expanded={urlOpen}
-        className="text-[11px] font-medium text-ink-600 underline decoration-line underline-offset-2 transition-colors hover:text-ink-900"
-      >
-        {urlOpen ? 'Cancelar' : 'Añadir desde una URL'}
-      </button>
-
-      {urlOpen ? (
-        <form
-          onSubmit={handleUrl}
-          className="space-y-1.5 rounded-md border border-line bg-paper-50 p-2"
-        >
-          <input
-            type="url"
-            required
-            value={url}
-            onChange={(event) => setUrl(event.target.value)}
-            placeholder="https://ejemplo.com/imagen.jpg"
-            aria-label="URL de la imagen"
-            className="w-full rounded border border-line bg-white px-2 py-1.5 text-[11px] text-ink-900 outline-none placeholder:text-ink-400 focus:border-ink-400"
-          />
-          <div className="flex items-center gap-1.5">
-            <label className="flex items-center gap-1 text-[11px] text-ink-600">
-              Página
-              <select
-                value={urlPage}
-                onChange={(event) => setUrlPage(Number(event.target.value))}
-                className="rounded border border-line bg-white px-1 py-1 text-[11px] text-ink-900 outline-none focus:border-ink-400"
-              >
-                {PAGE_NUMBERS.map((page) => (
-                  <option key={page} value={page}>
-                    {page}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button
-              type="submit"
-              disabled={busy}
-              className="ml-auto rounded-md bg-ink-900 px-2.5 py-1.5 text-[11px] font-medium text-paper-50 transition-colors hover:bg-ink-700 disabled:opacity-60"
-            >
-              {busy ? 'Cargando…' : 'Añadir'}
-            </button>
-          </div>
-          {urlError ? (
-            <p role="alert" className="text-[11px] leading-relaxed text-red-700">
-              {urlError}
-            </p>
-          ) : null}
-        </form>
-      ) : null}
-    </div>
   );
 }
 

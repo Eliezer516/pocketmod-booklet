@@ -75,16 +75,16 @@ Hay dos formas de añadir imágenes:
   ~~~
 
 - **Una imagen por página**: en la vista **Cuadernillo**, cada página tiene un
-  botón **+** justo debajo. Al pulsarlo se elige un archivo; si la página ya
-  tiene imagen, el botón muestra una miniatura con **Cambiar** y una **×** para
-  quitarla. La imagen ocupa toda el área imprimible de la página y el texto se
-  reparte por las páginas que quedan libres.
+  botón **+** justo debajo. Al pulsarlo aparecen dos opciones: **Subir un
+  archivo** o **Usar una URL**. Si la página ya tiene imagen, el botón muestra
+  una miniatura con **Cambiar** y una **×** para quitarla. La imagen ocupa toda
+  el área imprimible de la página y el texto se reparte por las páginas que
+  quedan libres.
 
-En **Formato › Imágenes por página › Añadir desde una URL** puedes pegar la
-dirección de una imagen y elegir la página. Si el servidor permite leerla entre
-dominios, se descarga y se guarda incrustada como las subidas; si no, se guarda
-la dirección y la imagen se carga desde la red. En el texto también puedes
-insertar una imagen remota escribiendo `![pie de foto](https://…)`.
+Al usar una URL, si el servidor permite leerla entre dominios, la imagen se
+descarga y se guarda incrustada como las subidas; si no, se guarda la dirección y
+la imagen se carga desde la red. En el texto también puedes insertar una imagen
+remota escribiendo `![pie de foto](https://…)`.
 
 En **Formato › Alineación de imágenes** eliges izquierda, centro o derecha, o
 arriba y abajo. En las imágenes de página, la alineación decide en qué borde del

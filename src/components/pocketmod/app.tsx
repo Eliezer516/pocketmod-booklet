@@ -270,8 +270,6 @@ export function App() {
             <ControlsPanel
               settings={settings}
               onChange={updateSetting}
-              pageImages={pageImages}
-              onPageImageChange={updatePageImage}
               usedFontSizePt={result?.usedFontSizePt ?? settings.fontSizePt}
               shrunk={result?.shrunk ?? false}
               bookletCount={bookletCount}
