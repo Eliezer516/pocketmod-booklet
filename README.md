@@ -76,10 +76,11 @@ Hay dos formas de añadir imágenes:
 
 - **Una imagen por página**: en la vista **Cuadernillo**, cada página tiene un
   botón **+** justo debajo. Al pulsarlo aparecen dos opciones: **Subir un
-  archivo** o **Usar una URL**. Si la página ya tiene imagen, el botón muestra
-  una miniatura con **Cambiar** y una **×** para quitarla. La imagen ocupa toda
-  el área imprimible de la página y el texto se reparte por las páginas que
-  quedan libres.
+  archivo** o **Usar una URL**. También puedes arrastrar una imagen desde el
+  escritorio y soltarla directamente sobre la página que quieras. Si la página
+  ya tiene imagen, el botón muestra una miniatura con **Cambiar** y una **×**
+  para quitarla. La imagen ocupa toda el área imprimible de la página y el texto
+  se reparte por las páginas que quedan libres.
 
 Al usar una URL, si el servidor permite leerla entre dominios, la imagen se
 descarga y se guarda incrustada como las subidas; si no, se guarda la dirección y

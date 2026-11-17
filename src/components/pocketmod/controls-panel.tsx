@@ -81,10 +81,10 @@ export function ControlsPanel({
             ]}
           />
           <p className="text-[11px] leading-relaxed text-ink-500">
-            Añade una imagen con el botón + bajo cada página del cuadernillo,
-            desde un archivo o una URL. La imagen ocupa toda la página y la
-            alineación decide cómo se encaja cuando su proporción no coincide
-            con la de la hoja.
+            Añade una imagen con el botón + bajo cada página del cuadernillo o
+            arrástrala directamente sobre la página, desde un archivo o una URL.
+            La imagen ocupa toda la página y la alineación decide cómo se encaja
+            cuando su proporción no coincide con la de la hoja.
           </p>
         </Field>
 

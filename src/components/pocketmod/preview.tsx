@@ -2,8 +2,10 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type DragEvent,
   type ReactNode,
 } from "react";
+import { encodeImageFile } from "../../lib/images";
 import type { PageImage, PageImages } from "../../lib/page-images";
 import {
   PAPERS,
@@ -228,9 +230,77 @@ function PagesView({
     : 0.45;
   const cardWidth = pageWidthPx * scale;
   const cardHeight = pageHeightPx * scale;
+  const [dropPage, setDropPage] = useState<number | null>(null);
+  const [busyPage, setBusyPage] = useState<number | null>(null);
+  const [dropError, setDropError] = useState<string | null>(null);
+
+  const isFileDrag = (event: DragEvent<Element>) =>
+    Array.from(event.dataTransfer.types).includes("Files");
+
+  const handleDragOver = (event: DragEvent<HTMLDivElement>, page: number) => {
+    if (!isFileDrag(event)) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+    setDropError(null);
+    setDropPage((current) => (current === page ? current : page));
+  };
+
+  const handleDragLeave = (event: DragEvent<HTMLDivElement>) => {
+    const next = event.relatedTarget;
+    if (next instanceof Node && event.currentTarget.contains(next)) return;
+    setDropPage(null);
+  };
+
+  const handleDrop = async (event: DragEvent<HTMLDivElement>, page: number) => {
+    event.preventDefault();
+    setDropPage(null);
+    if (!isFileDrag(event)) return;
+
+    const file = Array.from(event.dataTransfer.files).find(
+      (candidate) =>
+        candidate.type === "" || candidate.type.startsWith("image/"),
+    );
+    if (!file) {
+      setDropError("Arrastra un archivo de imagen (PNG, JPG, SVG…).");
+      return;
+    }
+
+    setDropError(null);
+    setBusyPage(page);
+    try {
+      onPageImageChange(page, await encodeImageFile(file));
+    } catch (cause) {
+      console.error("Error al procesar la imagen", cause);
+      setDropError(
+        "No se pudo cargar la imagen. Comprueba que el archivo sea una imagen válida.",
+      );
+    } finally {
+      setBusyPage(null);
+    }
+  };
 
   return (
-    <div ref={ref} className="w-full">
+    <div
+      ref={ref}
+      className="w-full"
+      onDragOver={(event) => {
+        // Keep a file dropped outside a page from replacing the app.
+        if (isFileDrag(event)) event.preventDefault();
+      }}
+      onDrop={(event) => {
+        event.preventDefault();
+        setDropPage(null);
+      }}
+    >
+      {dropError ? (
+        <p
+          role="alert"
+          className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-[12px] text-red-800"
+        >
+          {dropError}
+        </p>
+      ) : null}
+
       <div
         className="grid justify-center"
         style={{
@@ -242,8 +312,13 @@ function PagesView({
         {pages.map((page, index) => (
           <figure key={index} className="m-0 min-w-0">
             <div
-              className="paper-shadow overflow-hidden bg-white"
+              className="paper-shadow relative overflow-hidden bg-white"
               style={{ width: cardWidth, height: cardHeight }}
+              onDragOver={(event) => handleDragOver(event, index + 1)}
+              onDragLeave={handleDragLeave}
+              onDrop={(event) => {
+                void handleDrop(event, index + 1);
+              }}
             >
               <div
                 style={{
@@ -260,6 +335,28 @@ function PagesView({
                   pageImages={pageImages}
                 />
               </div>
+
+              {dropPage === index + 1 ? (
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center border-2 border-dashed border-accent-600 bg-paper-50/85 p-3 text-center"
+                >
+                  <span className="text-[11px] font-medium text-accent-700">
+                    Suelta la imagen
+                  </span>
+                </div>
+              ) : null}
+
+              {busyPage === index + 1 ? (
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-paper-50/85"
+                >
+                  <span className="text-[11px] text-ink-600">
+                    Procesando…
+                  </span>
+                </div>
+              ) : null}
             </div>
 
             <PageImageSlot
@@ -284,8 +381,9 @@ function PagesView({
       </div>
 
       <p className="mt-6 text-center text-[11px] leading-relaxed text-ink-500">
-        La página 1 es la portada y la 8 la contraportada. Las líneas se cortan
-        en límites de palabra para que nada se parta al doblar.
+        La página 1 es la portada y la 8 la contraportada. Arrastra una imagen
+        sobre una página para colocarla. Las líneas se cortan en límites de
+        palabra para que nada se parta al doblar.
       </p>
     </div>
   );
